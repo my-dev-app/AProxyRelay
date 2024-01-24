@@ -29,6 +29,10 @@ class AProxyRelayCore(object):
         self._queue_to_validate = Queue()
         self._queue_result = Queue()
 
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'
+        }
+
     async def _prep_proxy_list(self):
         """
         Prepares proxy list queue, fills it with available targets which have parsers.
@@ -64,7 +68,7 @@ class AProxyRelayCore(object):
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
             try:
                 # Make your asynchronous request here
-                async with session.get(url) as response:
+                async with session.get(url, headers=self.headers) as response:
                     # Process the response as needed
                     print(f"URL: {url}, Status Code: {response.status}")
                     if response.status == 200:
@@ -133,7 +137,7 @@ class AProxyRelayCore(object):
 
         async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:
             try:
-                async with session.get('https://gg.my-dev.app/api/v1/steam/filter/genres/', proxy=proxy_url) as response:
+                async with session.get('https://gg.my-dev.app/api/v1/steam/filter/genres/', proxy=proxy_url, headers=self.headers) as response:
                     print(f"Proxy usage -> Status Code: {response.status}")
                     if response.status == 200:
                         self._queue_result.put(proxy_url)

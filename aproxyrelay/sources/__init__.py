@@ -12,6 +12,7 @@ Contains various sources for proxies
 from .proxynova import ParserProxyNova
 from .lumiproxy import ParserLumiProxy
 from .proxyscrape import ParserProxyScrape
+from .spys import ParserSpys
 
 
 _proxy_list = [
@@ -27,10 +28,15 @@ _proxy_list = [
         'url': 'https://www.proxynova.com/proxy-server-list/country-nl',
         'parser': ParserProxyNova,
     },
+    {
+        'url': 'https://spys.one/free-proxy-list/NL/',
+        'parser': ParserSpys,
+    },
 ]
 
 __all__ = [
     ParserProxyNova,
     ParserLumiProxy,
     ParserProxyScrape,
+    ParserSpys,
 ]
