@@ -41,46 +41,52 @@ class AProxyRelayCore(object):
             self._queue_proxy_lists.put(item['url'])
 
     async def _obtain_proxies(self):
-        try:
-            print('Async method start')
-            await self._prep_proxy_list()
+        """
+        Main method of the core class. Fills _queue_result with proxies ready for use.
+        """
+        # try:
+        print('Async method start')
+        await self._prep_proxy_list()
 
-            # Create a list to hold the tasks for making asynchronous requests
-            tasks = []
+        # Create a list to hold the tasks for making asynchronous requests
+        tasks = []
 
-            while not self._queue_proxy_lists.empty():
-                url = self._queue_proxy_lists.get()
-                tasks.append(self._make_async_request(url))
-            
-            # Wait for all requests to complete
-            await asyncio.gather(*tasks)
+        while not self._queue_proxy_lists.empty():
+            url = self._queue_proxy_lists.get()
+            tasks.append(self._make_async_request(url))
+        
+        # Wait for all requests to complete
+        await asyncio.gather(*tasks)
 
-            await self._process_result()
-            if self.test_proxy:
-                await self._test_proxies()
+        await self._process_result()
+        if self.test_proxy:
+            await self._test_proxies()
 
-            print("Async method end")
+        print("Async method end")
 
-        except Exception as e:
-            print(f"Async method failed with error: {e}")
+        # except Exception as e:
+        #     print(f"Async method failed with error: {e}")
 
     async def _make_async_request(self, url):
+        """
+        Fetch proxy lists and execute their scrapers
+        """
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
-            try:
-                # Make your asynchronous request here
-                async with session.get(url, headers=self.headers) as response:
-                    # Process the response as needed
-                    print(f"URL: {url}, Status Code: {response.status}")
-                    if response.status == 200:
-                        if response.content_type == 'application/json':
-                            data = await response.json()
-                        elif response.content_type == 'text/html':
-                            data = await [p for p in _proxy_list if p['url'] == url][0]['parser']._scrape(response)
-                        else:
-                            raise ReferenceError(f'None exiting content type for parser: {response.content_type}')
-                        await self._prep_parser(url, data)
-            except Exception as e:
-                print(f"Request for URL {url} failed with error: {e}")
+            # try:
+            # Make your asynchronous request here
+            async with session.get(url, headers=self.headers) as response:
+                # Process the response as needed
+                print(f"URL: {url}, Status Code: {response.status}")
+                if response.status == 200:
+                    if response.content_type == 'application/json':
+                        data = await response.json()
+                    elif response.content_type == 'text/html':
+                        data = await [p for p in _proxy_list if p['url'] == url][0]['parser']._scrape(response)
+                    else:
+                        raise ReferenceError(f'None exiting content type for parser: {response.content_type}')
+                    await self._prep_parser(url, data)
+            # except Exception as e:
+            #     print(f"Request for URL {url} failed with error: {e}")
     
     async def _prep_parser(self, url, data):
         """Prepare parser queue with data from various scape providers, filters objects for the parser so the parser
@@ -133,6 +139,7 @@ class AProxyRelayCore(object):
         await asyncio.gather(*tasks)
 
     async def _test_proxy_link(self, proxy_url):
+        """Calls gg.my-dev.app, website build by the creator of this package. If the connection was successful, the proxy works!"""
         conn = ProxyConnector(remote_resolve=True)
 
         async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:

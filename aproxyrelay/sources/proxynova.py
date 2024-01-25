@@ -19,18 +19,6 @@ class ParserProxyNova(object):
         self.data = data
         if self.data is None: raise AttributeError('DATA is Required')
 
-    def _get_protocol(self, protocol: int):
-        prot = 'unknown'
-        if protocol == 1 or protocol == 2:
-            prot = 'http'
-        elif protocol == 2:
-            prot = 'https'
-        elif protocol == 4:
-            prot = 'Socks4'
-        elif protocol == 8:
-            prot = 'Socks5'
-        return prot.lower()
-
     async def _parse(self):
         try:
             return [

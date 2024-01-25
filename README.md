@@ -25,3 +25,20 @@ Make sure to run this command in a virtual environment
 
     pip install . && pip uninstall aproxyrelay -y
 
+## Usage
+"A Proxy Relay" does a couple of things for you.
+- Asynchoriously fetch lists of free proxies and test them right away
+- Puts data from various API's into an array to bypass API limiters
+
+    """Example for enduser useage"""
+    from aproxyrelay import AProxyRelay
+
+    proxy_relay = AProxyRelay(targets=[
+        'https://store.steampowered.com/api/appdetails?appids=1551360',
+        'https://store.steampowered.com/api/appdetails?appids=2072450',
+        'https://store.steampowered.com/api/appdetails?appids=1924360',
+        'https://store.steampowered.com/api/appdetails?appids=1707870',
+        'https://store.steampowered.com/api/appdetails?appids=1839880',
+    ], timeout=5, test_proxy=True)
+    data = proxy_relay.start()
+    print(data)

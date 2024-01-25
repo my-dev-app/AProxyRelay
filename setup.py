@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name='aproxyrelay',
@@ -9,6 +11,7 @@ setup(
         'aiohttp',
         'aiosocks2',
         'beautifulsoup4',
+        'lxml',
     ],
     entry_points={
         'console_scripts': [
@@ -18,6 +21,7 @@ setup(
     author='undeƒined',
     author_email='my-dev.app@domainsbyproxy.com',
     description='A Proxy Relay, forwarding requests through different IP.',
+    long_description=long_description,
     url='https://github.com/my-dev-app/proxy-relay',
     license='GNU AGPLv3',
 )
