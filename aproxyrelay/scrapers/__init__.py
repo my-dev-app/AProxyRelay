@@ -11,6 +11,7 @@ By undeƒined
 Proxy list and their mapped scrapers
 """
 from .parser_freeproxylist import ParserFreeProxyList
+from .parser_lumiproxy import ParserLumiProxy
 
 
 proxy_list = [
@@ -18,10 +19,10 @@ proxy_list = [
         'url': 'https://free-proxy-list.net/',
         'parser': ParserFreeProxyList,
     },
-    # {
-    #     'url': 'https://api.lumiproxy.com/web_v1/free-proxy/list?page_size=10000&page=1&country_code=nl',
-    #     'parser': ParserLumiProxy,
-    # },
+    {
+        'url': 'https://api.lumiproxy.com/web_v1/free-proxy/list?page_size=10000&page=1&country_code=nl',
+        'parser': ParserLumiProxy,
+    },
     # {
     #     'url': 'https://www.proxynova.com/proxy-server-list/country-nl',
     #     'parser': ParserProxyNova,

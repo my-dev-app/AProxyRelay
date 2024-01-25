@@ -21,6 +21,11 @@ class ParserFreeProxyList(MainScraper):
         MainScraper.__init__(self)
 
     @classmethod
+    async def format_url(cls, url, *args, **kwargs) -> str:
+        """Formats URL before scraping, let us adjust query parameters for each parser"""           
+        return url
+
+    @classmethod
     async def format_raw(cls, html: str) -> list:
         """Parse text/html pages, customized method for the parser of this website"""
         results = []

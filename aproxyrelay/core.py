@@ -72,15 +72,19 @@ class AProxyRelayCore(object):
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
             # try:
             # Make your asynchronous request here
-            async with session.get(url, headers=self._get_header()) as response:
+            parser = [p for p in proxy_list if p['url'] == url][0]['parser']
+            target_url = await parser.format_url(url, self.zone)
+            async with session.get(target_url, headers=self._get_header()) as response:
                 # Process the response as needed
                 self.logger.info(f"URL: {url}, Status Code: {response.status}")
                 if response.status == 200:
-                    new_queue = await [p for p in proxy_list if p['url'] == url][0]['parser'].scrape(response)
-                    if self.test_proxy:
-                        self._queue_to_validate = new_queue
-                    else:
-                        self.proxies = new_queue
+                    new_queue = await parser.scrape(response)
+                    while not new_queue.empty():
+                        row = new_queue.get()
+                        if self.test_proxy:
+                            self._queue_to_validate.put(row)
+                        else:
+                            self.proxies.put(row)
             # except Exception as e:
             #     self.logger.info(f"Request for URL {url} failed with error: {e}")
 
@@ -91,7 +95,8 @@ class AProxyRelayCore(object):
 
         while not self._queue_to_validate.empty():
             data = self._queue_to_validate.get()
-            tasks.append(self._test_proxy_link(f"{data['protocol']}://{data['ip']}:{data['port']}", data))
+            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}:{data['port']}"
+            tasks.append(self._test_proxy_link(ip, data))
 
         # Wait for all requests to complete
         await asyncio.gather(*tasks)

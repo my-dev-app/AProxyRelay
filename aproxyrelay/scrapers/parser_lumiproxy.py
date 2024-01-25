@@ -12,34 +12,44 @@ Main parser example, other parsers can inherit from this class
 """
 from queue import Queue
 
-from .core import ScraperCore
+from .parser import MainScraper
 
 
-class MainScraper(ScraperCore):
+class ParserLumiProxy(MainScraper):
     def __init__(self) -> None:
-        ScraperCore.__init__(self)
-
+        MainScraper.__init__(self)
+    
     @classmethod
-    async def format_url(cls, url, *args, **kwargs) -> str:
+    async def format_url(cls, url, zone:str = 'us', *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
-        new_url = f'{url}'
+        new_url = url.replace('country_code=nl', f'country_code={zone}')
         return new_url
 
     @classmethod
-    async def format_raw(cls, html: str):
-        """Parse text/html pages, customized method for the parser of this website"""
-        raise NotImplemented('Format raw parser has not been implemented yet')
+    async def format_data(cls, data: dict, queue: Queue) -> None:
+        """Data formatter, formats data and returns is back in the process Queue"""
+        for item in data['data']['list']:
+            queue.put({
+                'country': item['name_en'],
+                'zone': item['country_code'],
+                'method': cls._get_protocol(item['protocol']),
+                'anonymity': 'transparent' if item['anonymity'] not in [1, 2] else 'anonymous',
+                'protocol': cls._get_protocol(item['protocol']),
+                'port': str(item['port']),
+                'ip': item['ip'],
+            })
+        return queue
 
     @classmethod
-    async def format_data(cls, data: dict, queue: Queue):
-        """Data formatter, formats data and returns is back in the process Queue"""
-        raise NotImplemented('Form data parser has not been implemented yet')
-        # return queue.put({
-        #     'country': 'US',
-        #     'zone': 'US',
-        #     'method': 'http',
-        #     'anonymity': 'anonymous',
-        #     'protocol': 'http',
-        #     'port': '8080',
-        #     'ip': '127.0.0.1',
-        # })
+    def _get_protocol(cls, protocol: int) -> str:
+        """Determine protocol based on API output"""
+        prot = 'unknown'
+        if protocol == 1 or protocol == 2:
+            prot = 'http'
+        elif protocol == 2:
+            prot = 'https'
+        elif protocol == 4:
+            prot = 'Socks4'
+        elif protocol == 8:
+            prot = 'Socks5'
+        return prot.lower()
