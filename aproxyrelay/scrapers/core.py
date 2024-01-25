@@ -64,5 +64,5 @@ class ScraperCore(object):
         results = Queue()
         while not queue.empty():
             data = queue.get()
-            results.put(await cls.format_data(data, results))
+            results = await cls.format_data(data, results)
         return results

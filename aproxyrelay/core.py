@@ -65,9 +65,6 @@ class AProxyRelayCore(object):
         await asyncio.gather(*task_request_proxy_list)
 
         if self.test_proxy:
-            while not self.proxies.empty():
-                data = self.proxies.get()
-                self._queue_to_validate.put(data)
             await self._test_proxies()
 
     async def _request_scraper_page(self, url):
@@ -79,7 +76,11 @@ class AProxyRelayCore(object):
                 # Process the response as needed
                 self.logger.info(f"URL: {url}, Status Code: {response.status}")
                 if response.status == 200:
-                    self.proxies = await [p for p in proxy_list if p['url'] == url][0]['parser'].scrape(response)
+                    new_queue = await [p for p in proxy_list if p['url'] == url][0]['parser'].scrape(response)
+                    if self.test_proxy:
+                        self._queue_to_validate = new_queue
+                    else:
+                        self.proxies = new_queue
             # except Exception as e:
             #     self.logger.info(f"Request for URL {url} failed with error: {e}")
 
