@@ -58,7 +58,7 @@ class ParserSocksProxy(MainScraper):
                 'method': data['Version'].lower(),
                 'anonymity': 'anonymous' if data['Anonymity'].lower() in ['elite', 'anonymous'] else 'transparent',
                 'protocol': data['Version'].lower(),
-                'port': data['Port'],
+                'port': str(data['Port']),
                 'ip': data['IP Address'],
             })
         return queue

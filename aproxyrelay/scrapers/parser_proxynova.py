@@ -39,7 +39,7 @@ class ParserProxyNova(MainScraper):
             'method': 'http' if data['Https'] != 'yes' else 'https',
             'anonymity': data['Anonymity'],
             'protocol': 'http' if data['Https'] != 'yes' else 'https',
-            'port': data['Port'],
+            'port': str(data['Port']),
             'ip': data['IP Address'],
         })
         return queue

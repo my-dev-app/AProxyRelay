@@ -95,7 +95,7 @@ class AProxyRelayCore(object):
 
         while not self._queue_to_validate.empty():
             data = self._queue_to_validate.get()
-            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}:{data['port']}"
+            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(data['port']) > 0 else ''}"
             tasks.append(self._test_proxy_link(ip, data))
 
         # Wait for all requests to complete
@@ -112,4 +112,5 @@ class AProxyRelayCore(object):
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:
-                self.logger.info(f"Proxy request failed with error: {e}")
+                # self.logger.info(f"Proxy request failed with error: {e}")
+                pass
