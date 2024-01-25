@@ -12,6 +12,8 @@ Proxy list and their mapped scrapers
 """
 from .parser_freeproxylist import ParserFreeProxyList
 from .parser_lumiproxy import ParserLumiProxy
+from .parser_proxynova import ParserProxyNova
+from .parser_proxyscrape import ParserProxyScrape
 
 
 proxy_list = [
@@ -25,12 +27,13 @@ proxy_list = [
     },
     # {
     #     'url': 'https://www.proxynova.com/proxy-server-list/country-nl',
-    #     'parser': ParserProxyNova,
+    #     'parser': ParserProxyNova,  # TODO Website was down moment of developing this
     # },
-    # {
-    #     'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',
-    #     'parser': ParserProxyScrape,
-    # },
+    {
+        'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=all&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',
+        'parser': ParserProxyScrape,
+    },
+
     # {
     #     'url': 'https://socks-proxy.net/',
     #     'parser': ParserSocksProxy,
