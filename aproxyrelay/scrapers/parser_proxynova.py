@@ -31,7 +31,7 @@ class ParserProxyNova(MainScraper):
         return html
 
     @classmethod
-    async def format_data(cls, data: dict, queue: Queue) -> None:
+    async def format_data(cls, zone: str, data: dict, queue: Queue) -> None:
         """Data formatter, formats data and returns is back in the process Queue"""
         queue.put({
             'country': data['Country'],

@@ -49,15 +49,16 @@ class ParserFreeProxyList(MainScraper):
         return results
 
     @classmethod
-    async def format_data(cls, data: dict, queue: Queue) -> None:
+    async def format_data(cls, zone: str, data: dict, queue: Queue) -> None:
         """Data formatter, formats data and returns is back in the process Queue"""
-        queue.put({
-            'country': data['Country'],
-            'zone': data['Code'],
-            'method': 'http' if data['Https'] != 'yes' else 'https',
-            'anonymity': data['Anonymity'],
-            'protocol': 'http' if data['Https'] != 'yes' else 'https',
-            'port': data['Port'],
-            'ip': data['IP Address'],
-        })
+        if data['Code'] == zone.upper():
+            queue.put({
+                'country': data['Country'],
+                'zone': data['Code'],
+                'method': 'http' if data['Https'] != 'yes' else 'https',
+                'anonymity': data['Anonymity'],
+                'protocol': 'http' if data['Https'] != 'yes' else 'https',
+                'port': data['Port'],
+                'ip': data['IP Address'],
+            })
         return queue

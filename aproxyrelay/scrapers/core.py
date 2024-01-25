@@ -24,7 +24,7 @@ class ScraperCore(object):
         self.logger = logging.getLogger(__name__)
 
     @classmethod
-    async def scrape(cls, response):
+    async def scrape(cls, zone, response):
         if response.content_type == 'application/json':
             data = await response.json()
         elif response.content_type == 'text/html':
@@ -33,7 +33,7 @@ class ScraperCore(object):
         else:
             raise ReferenceError(f'None exiting content type for parser: {response.content_type}')
         queue = await cls._flatten_response(data)
-        return await cls._format_queue(str(response.real_url), queue)
+        return await cls._format_queue(zone, queue)
 
     @classmethod
     async def _flatten_response(cls, data) -> Queue:
@@ -47,7 +47,7 @@ class ScraperCore(object):
         return results
 
     @classmethod
-    async def _format_queue(cls, url: str, queue: Queue) -> Queue:
+    async def _format_queue(cls, zone: str, queue: Queue) -> Queue:
         """
         Formats queue into a pre-set json scheme
         
@@ -64,5 +64,5 @@ class ScraperCore(object):
         results = Queue()
         while not queue.empty():
             data = queue.get()
-            results = await cls.format_data(data, results)
+            results = await cls.format_data(zone, data, results)
         return results

@@ -31,16 +31,17 @@ class ParserProxyScrape(MainScraper):
         return html
 
     @classmethod
-    async def format_data(cls, data: dict, queue: Queue) -> None:
+    async def format_data(cls, zone: str, data: dict, queue: Queue) -> None:
         """Data formatter, formats data and returns is back in the process Queue"""
         for item in data['proxies']:
-            queue.put({
-                'country': item['ip_data']['country'],
-                'zone': item['ip_data']['continentCode'],
-                'method': item['protocol'],
-                'anonymity': 'anonymous' if item['anonymity'] in ['elite', 'anonymous'] else 'transparent',
-                'protocol': item['protocol'],
-                'port': item['port'],
-                'ip': item['ip'],
-            })
+            if item['ip_data']['countryCode'] == zone.upper():
+                queue.put({
+                    'country': item['ip_data']['country'],
+                    'zone': item['ip_data']['continentCode'],
+                    'method': item['protocol'],
+                    'anonymity': 'anonymous' if item['anonymity'] in ['elite', 'anonymous'] else 'transparent',
+                    'protocol': item['protocol'],
+                    'port': item['port'],
+                    'ip': item['ip'],
+                })
         return queue

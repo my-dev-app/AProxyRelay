@@ -78,7 +78,7 @@ class AProxyRelayCore(object):
                 # Process the response as needed
                 self.logger.info(f"URL: {url}, Status Code: {response.status}")
                 if response.status == 200:
-                    new_queue = await parser.scrape(response)
+                    new_queue = await parser.scrape(self.zone, response)
                     while not new_queue.empty():
                         row = new_queue.get()
                         if self.test_proxy:

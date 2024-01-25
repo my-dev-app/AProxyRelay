@@ -14,6 +14,7 @@ from .parser_freeproxylist import ParserFreeProxyList
 from .parser_lumiproxy import ParserLumiProxy
 from .parser_proxynova import ParserProxyNova
 from .parser_proxyscrape import ParserProxyScrape
+from .parser_socks_proxy import ParserSocksProxy
 
 
 proxy_list = [
@@ -33,11 +34,11 @@ proxy_list = [
         'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=all&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',
         'parser': ParserProxyScrape,
     },
+    {
+        'url': 'https://socks-proxy.net/',
+        'parser': ParserSocksProxy,
+    },
 
-    # {
-    #     'url': 'https://socks-proxy.net/',
-    #     'parser': ParserSocksProxy,
-    # },
     # {
     #     'url': 'https://spys.one/free-proxy-list/NL/',
     #     'parser': ParserSpys,
