@@ -21,7 +21,7 @@ from .core import AProxyRelayCore
 
 
 class AProxyRelay(AProxyRelayCore):
-    def __init__(self, targets: list[str], timeout: int = 5, test_proxy: bool = True, zone: str = 'us', debug: bool = False) -> None:
+    def __init__(self, targets: list[str], timeout: int = 5, test_proxy: bool = True, zone: str = 'us', debug: bool = False, steam: bool = False) -> None:
         """
         Args:
             targets list[str]: Target URL's to obtain data from
@@ -33,21 +33,24 @@ class AProxyRelay(AProxyRelayCore):
         self.logger = logging.getLogger(__name__)
 
         # TODO raise exceptions
-        self.targets = targets
         self.timeout = timeout
         self.test_proxy = test_proxy
         self.zone = zone
         self.debug = debug
 
-        self.proxies = []
+        self._steam = steam
+
         AProxyRelayCore.__init__(self)
+        for item in targets:
+            self._queue_target_process.put(item)
 
     async def _main(self) -> list:
         """
         Starts scrape task, once finised, you will endup with the data from the api in an array.
         """
         await self.get_proxies()
-        return self.proxies
+        await self.process_targets()
+        return self._queue_result
 
     def start(self) -> list:
         """

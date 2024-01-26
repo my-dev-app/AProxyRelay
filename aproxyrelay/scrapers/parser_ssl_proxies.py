@@ -16,7 +16,7 @@ from queue import Queue
 from .parser import MainScraper
 
 
-class ParserSocksProxy(MainScraper):
+class ParserSSLProxies(MainScraper):
     def __init__(self) -> None:
         MainScraper.__init__(self)
 
@@ -55,9 +55,9 @@ class ParserSocksProxy(MainScraper):
             queue.put({
                 'country': data['Country'],
                 'zone': data['Code'],
-                'method': data['Version'].lower(),
+                'method': 'https',
                 'anonymity': 'anonymous' if data['Anonymity'].lower() in ['elite', 'anonymous', 'elite proxy'] else 'transparent',
-                'protocol': data['Version'].lower(),
+                'protocol': 'https',
                 'port': str(data['Port']),
                 'ip': data['IP Address'],
             })

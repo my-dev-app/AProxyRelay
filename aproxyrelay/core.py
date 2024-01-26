@@ -10,18 +10,21 @@ By undeƒined
 
 Core of the proxy relay, contains async within the library
 """
+from aiosocks2.connector import ProxyConnector, ProxyClientRequest
+from datetime import datetime, UTC
 from queue import Queue
 
 import asyncio
 import aiohttp
 
-from aiosocks2.connector import ProxyConnector, ProxyClientRequest
 
 from .agents import UserAgents
 from .scrapers import proxy_list
+from .process import AProxyRelayProcessor
 
 
-class AProxyRelayCore(object):
+class AProxyRelayCore(AProxyRelayProcessor):
+# class AProxyRelayCore(object):
     """
     Core which manage proxies and scraped links.
     Designed for speed and to bypass api limiters.
@@ -34,13 +37,20 @@ class AProxyRelayCore(object):
         # Various queues which hold processing steps.
         self._queue_scrape_urls = Queue()
         self._queue_to_validate = Queue()
-        self._queue_result = Queue()
+
+        self._queue_target_process = Queue()  # holds targets
+        self._queue_result = Queue()  # Holds target results
 
         self.proxies = Queue()
+        AProxyRelayProcessor.__init__(self)
     
     async def get_proxies(self) -> None:
         """Fill the self.proxies queue with fresh proxies"""
         await self._process()
+    
+    async def process_targets(self) -> None:
+        """Process targets with available proxies"""
+        await self._process_targets_main()
 
     def _get_header(self) -> dict:
         """Obtain random user-agent header"""
@@ -52,6 +62,7 @@ class AProxyRelayCore(object):
         """
         Process library
         """
+        started = datetime.now(UTC)
         for item in proxy_list:
             self._queue_scrape_urls.put(item['url'])
 
@@ -66,6 +77,8 @@ class AProxyRelayCore(object):
 
         if self.test_proxy:
             await self._test_proxies()
+        
+        self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - started}')
 
     async def _request_scraper_page(self, url):
         """Fetch URL and execute the pre-coded scraper for that specific website"""
@@ -108,7 +121,7 @@ class AProxyRelayCore(object):
         async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:
             try:
                 async with session.get('https://gg.my-dev.app/api/v1/steam/filter/genres/', proxy=proxy_url, headers=self._get_header()) as response:
-                    self.logger.info(f"Proxy usage -> Status Code: {response.status}")
+                    self.logger.debug(f"Proxy usage -> Status Code: {response.status}")
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:

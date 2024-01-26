@@ -39,7 +39,7 @@ class ParserProxyScrape(MainScraper):
                     'country': item['ip_data']['country'].replace('The', ''),
                     'zone': item['ip_data']['countryCode'],
                     'method': item['protocol'],
-                    'anonymity': 'anonymous' if item['anonymity'] in ['elite', 'anonymous'] else 'transparent',
+                    'anonymity': 'anonymous' if item['anonymity'] in ['elite', 'elite proxy', 'anonymous'] else 'transparent',
                     'protocol': item['protocol'],
                     'port': str(item['port']),
                     'ip': item['ip'],

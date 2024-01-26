@@ -11,7 +11,6 @@ setup(
         'aiohttp',
         'aiosocks2',
         'beautifulsoup4',
-        'lxml',
     ],
     entry_points={
         'console_scripts': [
