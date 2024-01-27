@@ -16,6 +16,7 @@ from queue import Queue
 
 import asyncio
 import aiohttp
+import json
 
 
 from .agents import UserAgents
@@ -78,7 +79,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
         if self.test_proxy:
             await self._test_proxies()
         
-        self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - started}')
+        self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - started}, Please wait...')
 
     async def _request_scraper_page(self, url):
         """Fetch URL and execute the pre-coded scraper for that specific website"""
@@ -89,7 +90,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
             target_url = await parser.format_url(url, self.zone)
             async with session.get(target_url, headers=self._get_header()) as response:
                 # Process the response as needed
-                self.logger.info(f"URL: {url}, Status Code: {response.status}")
+                self.logger.debug(f"URL: {await parser.format_url(url, zone=self.zone)}, Status Code: {response.status}")
                 if response.status == 200:
                     new_queue = await parser.scrape(self.zone, response)
                     while not new_queue.empty():
@@ -108,7 +109,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
 
         while not self._queue_to_validate.empty():
             data = self._queue_to_validate.get()
-            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(data['port']) > 0 else ''}"
+            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(str(data['port'])) > 0 else ''}"
             tasks.append(self._test_proxy_link(ip, data))
 
         # Wait for all requests to complete
@@ -118,12 +119,20 @@ class AProxyRelayCore(AProxyRelayProcessor):
         """Calls gg.my-dev.app, website build by the creator of this package. If the connection was successful, the proxy works!"""
         conn = ProxyConnector(remote_resolve=True)
 
-        async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:
+        async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.test_timeout) as session:
             try:
-                async with session.get('https://gg.my-dev.app/api/v1/steam/filter/genres/', proxy=proxy_url, headers=self._get_header()) as response:
+                async with session.post(
+                    'https://gg.my-dev.app/api/v1/proxies/validate/lib',
+                    proxy=proxy_url,
+                    headers={
+                        **self._get_header(),
+                        'Content-Type': 'application/json'
+                    },
+                    data=json.dumps(data)
+                ) as response:
                     self.logger.debug(f"Proxy usage -> Status Code: {response.status}")
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:
-                # self.logger.info(f"Proxy request failed with error: {e}")
+                # self.logger.error(f"Proxy request failed with error: {e}")
                 pass

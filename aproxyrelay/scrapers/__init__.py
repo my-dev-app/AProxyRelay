@@ -11,8 +11,8 @@ By undeƒined
 Proxy list and their mapped scrapers
 """
 from .parser_freeproxylist import ParserFreeProxyList
+from .parser_gg_my_dev_app import ParserGGMyDevApp
 from .parser_lumiproxy import ParserLumiProxy
-from .parser_proxynova import ParserProxyNova
 from .parser_proxyscrape import ParserProxyScrape
 from .parser_socks_proxy import ParserSocksProxy
 from .parser_spys_de import ParserSpysDE
@@ -30,10 +30,6 @@ proxy_list = [
         'url': 'https://api.lumiproxy.com/web_v1/free-proxy/list?page_size=10000&page=1&country_code=nl',
         'parser': ParserLumiProxy,
     },
-    # {
-    #     'url': 'https://www.proxynova.com/proxy-server-list/country-nl',
-    #     'parser': ParserProxyNova,  # TODO Website was down moment of developing this
-    # },
     {
         'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=all&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',
         'parser': ParserProxyScrape,
@@ -57,5 +53,9 @@ proxy_list = [
     {
         'url': 'https://www.sslproxies.org/',
         'parser': ParserSSLProxies,
+    },
+    {
+        'url': 'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=1000',
+        'parser': ParserGGMyDevApp,
     },
 ]

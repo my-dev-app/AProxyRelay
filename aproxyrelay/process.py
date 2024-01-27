@@ -46,7 +46,7 @@ class AProxyRelayProcessor(object):
         except Exception as e:
             print(e)
 
-        self.logger.info(f'Processing: {datetime.now(UTC) - started} ... Please wait... ({self._queue_target_process.qsize()}) items in Queue')
+        self.logger.info(f'Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
 
         if self.proxies.empty() and self._queue_target_process.qsize() > 0:
             await self.get_proxies()

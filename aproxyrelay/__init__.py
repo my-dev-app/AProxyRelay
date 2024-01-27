@@ -21,7 +21,7 @@ from .core import AProxyRelayCore
 
 
 class AProxyRelay(AProxyRelayCore):
-    def __init__(self, targets: list[str], timeout: int = 5, test_proxy: bool = True, zone: str = 'us', debug: bool = False, steam: bool = False) -> None:
+    def __init__(self, targets: list[str], timeout: int = 5, test_proxy: bool = True, test_timeout: int = 20, zone: str = 'us', debug: bool = False, steam: bool = False) -> None:
         """
         Args:
             targets list[str]: Target URL's to obtain data from
@@ -34,6 +34,7 @@ class AProxyRelay(AProxyRelayCore):
 
         # TODO raise exceptions
         self.timeout = timeout
+        self.test_timeout = test_timeout
         self.test_proxy = test_proxy
         self.zone = zone
         self.debug = debug
@@ -57,6 +58,8 @@ class AProxyRelay(AProxyRelayCore):
         Start asynchronious scraping, returns results in Array format
         """
         started = datetime.now(UTC)
+        self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')
+
         loop = asyncio.get_event_loop()
         loop.set_debug(self.debug)
 
@@ -65,5 +68,5 @@ class AProxyRelay(AProxyRelayCore):
         task.set_name("AProxyRelay")
 
         loop.run_until_complete(task)
-        self.logger.info(f'Data scraped in {datetime.now(UTC) - started}')
+        self.logger.info(f'Data scraped! Took {datetime.now(UTC) - started}, enjoy!')
         return task.result()
