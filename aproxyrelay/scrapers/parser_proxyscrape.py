@@ -10,7 +10,6 @@ By undeƒined
 
 Main parser example, other parsers can inherit from this class
 """
-from bs4 import BeautifulSoup
 from queue import Queue
 
 from .parser import MainScraper
@@ -22,7 +21,7 @@ class ParserProxyScrape(MainScraper):
 
     @classmethod
     async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
-        """Formats URL before scraping, let us adjust query parameters for each parser"""           
+        """Formats URL before scraping, let us adjust query parameters for each parser"""
         return url.replace('country=NL', f'country={zone.upper()}')
 
     @classmethod

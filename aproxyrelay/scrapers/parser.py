@@ -28,18 +28,9 @@ class MainScraper(ScraperCore):
     @classmethod
     async def format_raw(cls, html: str):
         """Parse text/html pages, customized method for the parser of this website"""
-        raise NotImplemented('Format raw parser has not been implemented yet')
+        raise NotImplementedError('Format raw parser has not been implemented yet')
 
     @classmethod
     async def format_data(cls, data: dict, queue: Queue):
         """Data formatter, formats data and returns is back in the process Queue"""
-        raise NotImplemented('Form data parser has not been implemented yet')
-        # return queue.put({
-        #     'country': 'US',
-        #     'zone': 'US',
-        #     'method': 'http',
-        #     'anonymity': 'anonymous',
-        #     'protocol': 'http',
-        #     'port': '8080',
-        #     'ip': '127.0.0.1',
-        # })
+        raise NotImplementedError('Form data parser has not been implemented yet')

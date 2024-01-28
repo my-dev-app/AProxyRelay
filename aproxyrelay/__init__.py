@@ -23,15 +23,15 @@ from .core import AProxyRelayCore
 
 class AProxyRelay(AProxyRelayCore):
     def __init__(
-            self,
-            targets: list[str] = [],
-            timeout: int = 5,
-            test_proxy: bool = True,
-            test_timeout: int = 20,
-            zone: str = 'us',
-            debug: bool = False,
-            steam: bool = False
-        ) -> None:
+        self,
+        targets: list[str],
+        timeout: int = 5,
+        test_proxy: bool = True,
+        test_timeout: int = 20,
+        zone: str = 'us',
+        debug: bool = False,
+        steam: bool = False
+    ) -> None:
         """
         Initialize an instance of AProxyRelay.
 
@@ -58,7 +58,7 @@ class AProxyRelay(AProxyRelayCore):
         self._steam = steam
 
         AProxyRelayCore.__init__(self)
-        for item in targets:
+        for item in list(set(targets)):
             self._queue_target_process.put(item)
 
     async def _main(self) -> Queue:

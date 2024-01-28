@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 120
+max-complexity = 12
+exclude = .git,__pycache__,build,venv,.pytest_cache,aproxyrelay.egg-info
+filename = *.py
+ignore = E722,E501,E701,B902
+extend-ignore = E722,E501,W503
+extend-select = B0,B9

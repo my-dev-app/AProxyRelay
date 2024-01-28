@@ -12,7 +12,6 @@ Process class, once all proxies have been received, we are going to obtain the d
 This class contains the core mechanics for scraping the targets.
 """
 from aiosocks2.connector import ProxyConnector, ProxyClientRequest
-from datetime import datetime, UTC
 from queue import Queue
 
 import asyncio
@@ -36,7 +35,7 @@ class AProxyRelayProcessor(object):
         tasks = []
         while not self._queue_target_process.empty():
             proxy = self.proxies.get()
-            if type(proxy) == dict:
+            if type(proxy) is dict:
                 proxy = f"{proxy['protocol']}://{proxy['ip']}:{proxy['port']}"
 
             target = self._queue_target_process.get()
