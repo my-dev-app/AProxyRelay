@@ -95,6 +95,8 @@ jobs:
     timeout-minutes: 30
     runs-on: self-hosted
     environment: production
+    permissions: 
+      id-token: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -121,15 +123,8 @@ jobs:
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
           tag: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
-      - name: Create .pypirc
-        run: |
-          echo "[distutils]" > .pypirc
-          echo "index-servers =" >> .pypirc
-          echo "    pypi" >> .pypirc
-          echo "" >> .pypirc
-          echo "[pypi]" >> .pypirc
-          echo "username = __token__" >> .pypirc
-          echo "password = ${{ secrets.PYPI_RELEASE_TOKEN }}" >> .pypirc
-      - name: Build and Publish
-        run: |
-          python3.11 setup.py sdist bdist_wheel upload -r pypi
+      - name: Publish package distributions to PyPI
+        env:
+          name: pypi
+          url: https://pypi.org/p/a-proxy-relay
+        uses: pypa/gh-action-pypi-publish@release/v1
