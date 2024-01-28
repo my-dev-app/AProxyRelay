@@ -125,13 +125,12 @@ jobs:
         run: |
           echo -e 'cat > .pypirc << EOF\
           [distutils]
-          \nindex-servers =
-          \n    pypi
-          \n
-          \n[pypi]
-          \nusername = __token__
-          \npassword = ${{ secrets.PYPI_RELEASE_TOKEN }}
-          \nEOF\n'
+          \nindex-servers =\
+          \n    pypi\
+          \n\
+          \n[pypi]\
+          \nusername = __token__\
+          \npassword = ${{ secrets.PYPI_RELEASE_TOKEN }}'
       - name: Build and Publish
         run: |
           python3.11 setup.py sdist bdist_wheel upload -r pypi
