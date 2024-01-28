@@ -40,6 +40,7 @@ setup(
     author_email='my-dev.app@domainsbyproxy.com',
     description='A Proxy Relay, forwarding requests through different IP.',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/my-dev-app/proxy-relay',
     license='GNU AGPLv3',
 )
