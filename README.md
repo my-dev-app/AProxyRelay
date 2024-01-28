@@ -16,7 +16,7 @@ In addition, tested proxies will be shared with other people using this library.
 Our scraper, used to obtain proxies, is highly modular and plug-and-play, making it easy to contribute to.
 
 ## Compiling to package
-To compile the library into a package, use the following command:
+To compile the library into a package, use the following command after installing `requirements.txt`:
 
 ```sh
 python setup.py sdist bdist_wheel
