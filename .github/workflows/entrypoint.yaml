@@ -109,7 +109,7 @@ jobs:
         run: python3.11 -m pip install --upgrade pip setuptools wheel
       - name: Build package
         env:
-          CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}-${{ steps.date.outputs.date }}r${{ github.run_id }}
+          CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
         run: python3.11 setup.py sdist bdist_wheel
       - name: Create a Release
         id: release
@@ -120,4 +120,4 @@ jobs:
           generateReleaseNotes: true
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
-          tag: 1.${{ github.run_number }}.${{ github.run_attempt }}-${{ steps.date.outputs.date }}r${{ github.run_id }}
+          tag: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
