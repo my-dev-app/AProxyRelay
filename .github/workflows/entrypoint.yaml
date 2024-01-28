@@ -115,11 +115,10 @@ jobs:
       - name: Build package
         env:
           CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
-        run: python3.11 setup.py sdist bdist_wheel
+        run: |
+          python3.11 setup.py sdist bdist_wheel
+          ls -l
       - name: Publish package distributions to PyPI
-        env:
-          name: pypi
-          url: https://pypi.org/p/a-proxy-relay
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
