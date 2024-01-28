@@ -104,15 +104,14 @@ jobs:
           string: ${{github.event.repository.name}}
       - name: Install dependencies
         run: python3.11 -m pip install --upgrade pip setuptools wheel
-      - name: Get next version
-        uses: reecetech/version-increment@2023.9.3
-        id: version
+      - name: Generate build number
+        id: buildnumber
+        uses: onyxmueller/build-tag-number@v1
         with:
-          scheme: semver
-          increment: patch
+          token: ${{secrets.PERSONAL_GITHUB_ACTIONS_TOKEN}}  
       - name: Build package
         env:
-          CUSTOM_VERSION: ${{ steps.version.outputs.version }}
+          CUSTOM_VERSION: ${{ steps.buildnumber.outputs.build_number }}
         run: python3.11 setup.py sdist bdist_wheel
       - name: Create a Release
         id: release
@@ -123,4 +122,4 @@ jobs:
           generateReleaseNotes: true
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
-          tag: ${{ steps.version.outputs.version }}
+          tag: ${{ steps.buildnumber.outputs.build_number }}
