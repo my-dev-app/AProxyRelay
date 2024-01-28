@@ -5,9 +5,8 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 addopts = "-n 8 --exitfirst --dist loadfile -vs --junitxml htmlcov/pytest.xml --cov --cov-report html --cov-report xml --cov-report term"
 testpaths = [
-    "tests.py",
-    "test_*.py",
-    "*_tests.py",
+    "tests/test_*.py",
+    "tests/*/test_*.py",
 ]
 
 [tool.coverage.run]
