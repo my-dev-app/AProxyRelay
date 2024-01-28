@@ -11,6 +11,29 @@
             "program": "${workspaceFolder}/start.py",
             "console": "integratedTerminal",
             "justMyCode": true
-        }
+        },
+        {
+            "name": "Test: Targeted",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "test",
+                "tests.test_class_initialization",
+            ],
+            "django": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Test: Pytest",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+
+            "env": {
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+            },
+            "justMyCode": true
+        },
     ]
 }
