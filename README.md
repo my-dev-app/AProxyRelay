@@ -21,16 +21,6 @@ In addition, tested proxies will be shared with other people using this library.
 
 Our scraper, used to obtain proxies, is highly modular and plug-and-play, making it easy to contribute to.
 
-## Compiling to package
-To compile the library into a package, use the following command after installing `requirements.txt`:
-
-```sh
-python setup.py sdist bdist_wheel
-```
-
-This will generate the package in the `dist` folder.
-Note: A version can be set with the environment variable `CUSTOM_VERSION`
-
 ## Usage
 AProxyRelay streamlines the process of making asynchronous requests with proxy servers. It offers the following features:
 - Asynchronously fetches lists of free proxies from various sources based on the provided zone
@@ -65,6 +55,11 @@ data = proxy_relay.start()
 # Result Queue
 print(data.qsize())
 ```
+
+## A Proxy Relay: Installation
+Simply run
+
+    pip install aproxyrelay
 
 ## A Proxy Relay: Local Development
 To install all library dependencies for local development, excluding the core code available locally, use the following command within a virtual environment:
@@ -139,3 +134,13 @@ To contribute your own proxy scraper, follow these steps:
     - Add the targeted link and your scraper to `scrapers/__init__.py`.
 
 Feel free to contribute, share your improvements, and expand the library's capabilities. Your efforts contribute to a growing pool of available proxies for the AProxyRelay community.
+
+## Compiling to package
+To compile the library into a package, use the following command after installing `requirements.txt`:
+
+```sh
+python setup.py sdist bdist_wheel
+```
+
+This will generate the package in the `dist` folder.
+Note: A version can be set with the environment variable `CUSTOM_VERSION`
