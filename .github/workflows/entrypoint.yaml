@@ -102,24 +102,22 @@ jobs:
         uses: ASzc/change-string-case-action@v5
         with:
           string: ${{github.event.repository.name}}
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Install dependencies
         run: python3.11 -m pip install --upgrade pip setuptools wheel
-      - name: Generate build number
-        id: buildnumber
-        uses: onyxmueller/build-tag-number@v1
-        with:
-          token: ${{secrets.PERSONAL_GITHUB_ACTIONS_TOKEN}}  
       - name: Build package
         env:
-          CUSTOM_VERSION: ${{ steps.buildnumber.outputs.build_number }}
+          CUSTOM_VERSION: ${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}-${{ steps.date.outputs.date }}
         run: python3.11 setup.py sdist bdist_wheel
       - name: Create a Release
         id: release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl.txt"
+          artifacts: "dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl"
           bodyFile: "README.md"
           generateReleaseNotes: true
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
-          tag: ${{ steps.buildnumber.outputs.build_number }}
+          tag: ${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}-${{ steps.date.outputs.date }}
