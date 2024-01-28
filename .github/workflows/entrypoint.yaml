@@ -106,15 +106,12 @@ jobs:
         run: python3.11 -m pip install --upgrade pip setuptools wheel
       - name: Build package
         run: python3.11 setup.py sdist bdist_wheel
-      - name: Create GitHub Release
-        run: |
-          tag=$(git describe --tags --abbrev=0)
-          changelog=$(git log --pretty=format:"- %s" $tag..HEAD)
-          echo "Creating GitHub release for tag $tag"
-          github-release release -t $tag -n $tag -b "$changelog"
-      - name: Upload release artifacts
-        run: |
-          github-release upload -t $tag -n "Source Distribution" -f dist/*.tar.gz
-          github-release upload -t $tag -n "Wheel Distribution" -f dist/*.whl
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
+      - name: Create a Release
+        id: release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl.txt"
+          bodyFile: "README.md"
+          generateReleaseNotes: true
+          makeLatest: true
+          token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
