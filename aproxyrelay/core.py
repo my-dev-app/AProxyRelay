@@ -46,13 +46,13 @@ class AProxyRelayCore(AProxyRelayProcessor):
 
         self.proxies = Queue()
         AProxyRelayProcessor.__init__(self)
-    
+
     async def get_proxies(self) -> None:
         """
         Asynchronously fill the self.proxies queue with fresh proxies.
         """
         await self._process()
-    
+
     async def process_targets(self) -> None:
         """
         Asynchronously process targets with available proxies.
@@ -69,7 +69,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
         return {
             'User-Agent': self._agents.random()
         }
-    
+
     async def _process(self) -> None:
         """
         Asynchronously process the library.
@@ -89,7 +89,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
 
         if self.test_proxy:
             await self._test_proxies()
-        
+
         self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - started}, Please wait...')
 
     async def _request_scraper_page(self, url) -> None:
@@ -127,7 +127,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
 
         while not self._queue_to_validate.empty():
             data = self._queue_to_validate.get()
-            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(str(data['port'])) > 0 else ''}"
+            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(str(data['port'])) > 0 else ''}"  # noqa: B950
             tasks.append(self._test_proxy_link(ip, data))
 
         # Wait for all requests to complete
@@ -137,14 +137,18 @@ class AProxyRelayCore(AProxyRelayProcessor):
         """
         Asynchronously call gg.my-dev.app, a website built by the creator of this package.
         If the connection was successful, the proxy works!
-        
+
         Args:
             proxy_url: The URL of the proxy to be tested.
             data: Additional data for the proxy test.
         """
         conn = ProxyConnector(remote_resolve=True)
 
-        async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.test_timeout) as session:
+        async with aiohttp.ClientSession(
+            connector=conn,
+            request_class=ProxyClientRequest,
+            conn_timeout=self.test_timeout
+        ) as session:
             try:
                 async with session.post(
                     'https://gg.my-dev.app/api/v1/proxies/validate/lib',

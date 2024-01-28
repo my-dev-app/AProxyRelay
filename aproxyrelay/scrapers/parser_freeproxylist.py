@@ -22,7 +22,7 @@ class ParserFreeProxyList(MainScraper):
 
     @classmethod
     async def format_url(cls, url, *args, **kwargs) -> str:
-        """Formats URL before scraping, let us adjust query parameters for each parser"""           
+        """Formats URL before scraping, let us adjust query parameters for each parser"""
         return url
 
     @classmethod
@@ -44,7 +44,7 @@ class ParserFreeProxyList(MainScraper):
                 row_data = [data.text.strip() for data in row.find_all("td")]
 
                 # Combine headers with row data and create a dictionary
-                data_dict = dict(zip(headers, row_data))
+                data_dict = dict(zip(headers, row_data, strict=True))
                 results.append(data_dict)
         return results
 

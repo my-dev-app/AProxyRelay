@@ -39,7 +39,7 @@ class ScraperCore(object):
     async def _flatten_response(cls, data) -> Queue:
         """Flat response data into a Queue ready to be parsed into a pre-set json scheme"""
         results = Queue()
-        if type(data) == list:
+        if type(data) is list:
             for item in data:
                 results.put(item)
         else:
@@ -50,7 +50,7 @@ class ScraperCore(object):
     async def _format_queue(cls, zone: str, queue: Queue) -> Queue:
         """
         Formats queue into a pre-set json scheme
-        
+
         {
             'country': str,
             'zone': str,

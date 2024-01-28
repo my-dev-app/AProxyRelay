@@ -31,7 +31,7 @@ proxy_list = [
         'parser': ParserLumiProxy,
     },
     {
-        'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=all&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',
+        'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=all&country=NL&anonymity=all&timeout=15000&proxy_format=ipport&format=json',  # noqa: B950
         'parser': ParserProxyScrape,
     },
     {
