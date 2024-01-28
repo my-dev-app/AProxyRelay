@@ -1,11 +1,16 @@
 from setuptools import setup, find_packages
 
+import os
+
+# Retrieve the version from the environment variable or use a default value
+version = os.getenv('CUSTOM_VERSION', '1.0.0')
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name='aproxyrelay',
-    version='0.1.0',
+    version=version,
     packages=find_packages(),
     install_requires=[
         'aiohttp',
