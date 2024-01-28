@@ -23,8 +23,8 @@ jobs:
         id: coverageComment
         uses: MishaKav/pytest-coverage-comment@v1.1.45
         with:
-          pytest-xml-coverage-path: ./htmlcov/coverage.xml
-          junitxml-path: ./htmlcov/pytest.xml
+          pytest-xml-coverage-path: htmlcov/coverage.xml
+          junitxml-path: htmlcov/pytest.xml
           title: PyTest Coverage
           badge-title: PyTest Coverage
           default-branch: ${{ github.ref }}
