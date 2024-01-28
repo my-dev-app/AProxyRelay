@@ -1,0 +1,14 @@
+name: Auto approve PR after tests
+run-name: Approving ${{ github.ref }} PR for ${{ github.actor }}
+on:
+  workflow_call:
+
+jobs:
+  auto_approve:
+    timeout-minutes: 30
+    runs-on: self-hosted
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Accepting PR
+        uses: hmarr/auto-approve-action@v3

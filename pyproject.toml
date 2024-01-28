@@ -1,3 +1,87 @@
 [build-system]
 requires = ["setuptools>=40.9.0", "wheel>=0.34.2"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "-n 8 --exitfirst --dist loadfile -vs --junitxml htmlcov/pytest.xml --cov --cov-report html --cov-report xml --cov-report term"
+testpaths = [
+    "tests/test_*.py",
+    "tests/*/test_*.py",
+]
+
+[tool.coverage.run]
+# Wheter to measure branch coverage in addition to statement coverage
+branch = true
+# The command-line to run your program. This will be used if you run coverage run with no further arguments. Coverage.py
+# options cannot be specified here, other than -m to indicate the module to run.
+command_line = "-m pytest"
+# (multi-string, default “thread”) The concurrency libraries in use by the product code.
+concurrency = [
+    "multiprocessing",
+    "thread",
+]
+# Append the machine name, process id and random number to the data file name to simplify collecting data from many 
+# processes
+parallel = true
+# A list of packages or directories, the source to measure during execution. If set, include is ignored.
+source = [
+    "aproxyrelay",
+]
+# Ignore specific files:
+omit = [
+    "*.html",
+    "*.txt",
+    "*.log",
+    "*.js",
+    "*.cjs",
+    "*.jsx",
+    "*.json",
+    "*.ts",
+    "*.tsx",
+    "*.css",
+    "*.sass",
+]
+# if true, register a SIGTERM signal handler to capture data when the process ends due to a SIGTERM signal.
+# Only on Linux and Mac.
+# sigterm = true
+# Use a simpler but slower trace method. This uses PyTracer instead of CTracer, and is only needed in very unusual
+# circumstances. Try this if you get seemingly impossible results.
+# timid = true
+plugins = []
+
+[tool.coverage.report]
+# If the total coverage measurement is under this value, then exit with a status code of 2.
+fail_under = 40
+# Ignore source code that can’t be found, emitting a warning instead of an exception.
+ignore_errors = false
+# A list of file name patterns, the files to include in reporting
+# include = [
+#     ".py",
+#     ".jinja"
+# ]
+# The number of digits after the decimal point to display for reported coverage percentages.
+precision = 2
+# When running a summary report, show missing lines.
+show_missing = true
+# Don’t report files that are 100% covered. This helps you focus on files that need attention.
+skip_covered = false
+# Don’t report files that have no executable code (such as __init__.py files).
+skip_empty = true
+# Sort coverage table by column name. Allowed values are; “Name”, “Stmts”, “Miss”, “Branch”, “BrPart”, or “Cover”
+sort = "Cover"
+
+[tool.coverage.html]
+# Where to write the HTML report files.
+directory = "htmlcov"
+# Should the HTML report include an indication on each line of which contexts executed the line.
+show_contexts = true
+# Don’t include files in the report that are 100% covered files.
+skip_covered = false
+# Don’t include empty files (those that have 0 statements) in the report.
+skip_empty = true
+# The title to use for the report. Note this is text, not HTML.
+title = "A Proxy Relay Coverage"
+
+[tool.coverage.xml]
+# Where to write the XML report.
+output = "htmlcov/coverage.xml"
