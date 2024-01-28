@@ -10,12 +10,14 @@ on:
       - 'master'
 
 jobs:
-  UpdatePR:
-    uses: ./.github/workflows/update_pr.yaml
+  update_pr:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged && github.ref != 'master' && github.ref != 'refs/heads/master'
+    uses: ./.github/workflows/auto_update_pr.yaml
     secrets: inherit
 
   flake:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged && github.ref != 'master' && github.ref != 'refs/heads/master'
+    needs: 
+      - update_pr
     uses: ./.github/workflows/test_python_flake.yaml
     secrets: inherit
 
