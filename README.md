@@ -62,7 +62,7 @@ print(data.qsize())
 ## A Proxy Relay: Local Development
 To install all library dependencies for local development, excluding the core code available locally, use the following command within a virtual environment:
 
-    pip install . && pip uninstall aproxyrelay -y
+    pip install -e .[dev]
 
 This command installs dependencies and removes the core code of AProxyRelay from the virtual environment.
 

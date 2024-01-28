@@ -1,3 +1,4 @@
+flake8-bugbear
+pytest
 setuptools
 wheel
-flake8-bugbear

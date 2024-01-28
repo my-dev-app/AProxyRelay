@@ -1,0 +1,28 @@
+name: Start Pycodestyle Tests
+run-name: Testing ${{ github.ref }} on pycodestyle for ${{ github.actor }}
+on:
+  workflow_call:
+
+jobs:
+  flake:
+    timeout-minutes: 30
+    runs-on: self-hosted
+    env:
+      USE_SQLITE: 1
+      REACT_APP_HOST_DOMAIN: 127.0.0.1:8000
+      REACT_APP_HOST_PROTOCOL: http://
+      REACT_APP_WEBSOCKET_DOMAIN: 127.0.0.1:8000
+      REACT_APP_WEBSOCKET_PROTOCOL: ws://
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+          python3.11 -m pip install --upgrade pip
+          python3.11 -m pip install -r requirements.txt --use-pep517
+      - name: Check code style
+        run: |
+          python3.11 -m flake8
