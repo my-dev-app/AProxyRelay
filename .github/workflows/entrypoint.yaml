@@ -38,10 +38,12 @@ jobs:
     secrets: inherit
 
   deployment_question:
+    if: |
+      github.event_name == 'pull_request' && 
+      github.event.pull_request.merged == true && 
+      github.ref == 'refs/heads/development' &&
+      github.event.action == 'closed'
     runs-on: self-hosted
-    needs:
-      - flake
-      - unittest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
