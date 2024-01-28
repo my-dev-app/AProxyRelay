@@ -11,7 +11,16 @@ on:
 
 jobs:
   update_pr:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged && github.ref != 'master' && github.ref != 'refs/heads/master'
+    if: |
+      github.event_name == 'pull_request' && 
+      !github.ref_protected && 
+      !github.event.pull_request.merged && 
+      github.ref != 'development' && 
+      github.ref != 'staging' && 
+      github.ref != 'master' && 
+      github.ref != 'refs/heads/development' && 
+      github.ref != 'refs/heads/master' && 
+      github.event.action != 'closed'
     uses: ./.github/workflows/auto_update_pr.yaml
     secrets: inherit
 
