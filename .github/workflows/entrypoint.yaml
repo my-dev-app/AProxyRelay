@@ -10,7 +10,7 @@ on:
       - 'master'
 
 jobs:
-  update_pr:
+  flake:
     if: |
       github.event_name == 'pull_request' && 
       !github.ref_protected && 
@@ -21,12 +21,6 @@ jobs:
       github.ref != 'refs/heads/development' && 
       github.ref != 'refs/heads/master' && 
       github.event.action != 'closed'
-    uses: ./.github/workflows/auto_update_pr.yaml
-    secrets: inherit
-
-  flake:
-    needs: 
-      - update_pr
     uses: ./.github/workflows/test_python_flake.yaml
     secrets: inherit
 
