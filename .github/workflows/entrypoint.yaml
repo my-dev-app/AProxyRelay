@@ -29,6 +29,7 @@ jobs:
 
   approve_development:
     needs:
+      - flake
       - unittest
     uses: ./.github/workflows/auto_approve.yaml
     secrets: inherit
