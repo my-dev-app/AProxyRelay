@@ -121,8 +121,17 @@ jobs:
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
           tag: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
-      - name: Publish distribution 📦 to PyPI
-        uses: ortega2247/pypi-upload-action@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Create .pypirc
+        run: |
+          echo -e 'cat > .pypirc << EOF\
+          [distutils]
+          \nindex-servers =
+          \n    pypi
+          \n
+          \n[pypi]
+          \nusername = __token__
+          \npassword = ${{ secrets.PYPI_RELEASE_TOKEN }}
+          \nEOF\n'
+      - name: Build and Publish
+        run: |
+          python3.11 setup.py sdist bdist_wheel upload -r pypi
