@@ -14,9 +14,28 @@ jobs:
     uses: ./.github/workflows/update_pr.yaml
     secrets: inherit
 
-  TestRepo:
-    runs-on: self-hosted
+  flake:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged && github.ref != 'master' && github.ref != 'refs/heads/master'
+    uses: ./.github/workflows/test_python_flake.yaml
+    secrets: inherit
+
+  unittest:
+    needs:
+      - flake
+    uses: ./.github/workflows/test_python_tests.yaml
+    secrets: inherit
+
+  approve_development:
+    needs:
+      - unittest
+    uses: ./.github/workflows/auto_approve.yaml
+    secrets: inherit
+
+  deployment_question:
+    runs-on: self-hosted
+    needs:
+      - flake
+      - unittest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -33,13 +52,13 @@ jobs:
         script: |
           const { repo, owner } = context.repo;
           const result = await github.rest.pulls.create({
-            title: 'Build Request - ${{ github.run_number }} | A Proxy Relay Package',
+            title: 'Deploy A Proxy Relay Package? - ${{ github.run_number }}',
             owner,
             repo,
             head: '${{ github.ref_name }}',
             base: 'master',
             body: [
-              'Request A Proxy Relay deployment',
+              'Would you like to release a new build of `aproxyrelay` ?\n',
               'Update A Proxy Relay to latest',
               '---',
               'Build and release new version!',
