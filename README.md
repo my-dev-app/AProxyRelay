@@ -23,6 +23,7 @@ python setup.py sdist bdist_wheel
 ```
 
 This will generate the package in the `dist` folder.
+Note: A version can be set with the environment variable `CUSTOM_VERSION`
 
 ## Usage
 AProxyRelay streamlines the process of making asynchronous requests with proxy servers. It offers the following features:

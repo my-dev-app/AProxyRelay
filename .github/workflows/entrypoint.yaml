@@ -104,7 +104,15 @@ jobs:
           string: ${{github.event.repository.name}}
       - name: Install dependencies
         run: python3.11 -m pip install --upgrade pip setuptools wheel
+      - name: Get next version
+        uses: reecetech/version-increment@2023.9.3
+        id: version
+        with:
+          scheme: semver
+          increment: patch
       - name: Build package
+        env:
+          CUSTOM_VERSION: ${{ steps.version.outputs.version }}
         run: python3.11 setup.py sdist bdist_wheel
       - name: Create a Release
         id: release
@@ -115,3 +123,4 @@ jobs:
           generateReleaseNotes: true
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
+          tag: ${{ steps.version.outputs.version }}
