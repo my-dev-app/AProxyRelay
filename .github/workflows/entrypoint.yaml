@@ -112,17 +112,16 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Install dependencies
         run: python3.11 -m pip install --upgrade pip setuptools wheel
-      - name: Build package
+
+      - name: Build and Publish
+        run: |
+          python3.11 -m build
+          python3.11 -m twine upload --repository pypi dist/*
         env:
           CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
-        run: |
-          python3.11 setup.py sdist bdist_wheel
-          ls -l
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_RELEASE_TOKEN }}
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_RELEASE_TOKEN }}
+
       - name: Create a Release
         id: release
         uses: ncipollo/release-action@v1
