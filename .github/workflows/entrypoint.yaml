@@ -64,7 +64,7 @@ jobs:
             head: '${{ github.ref_name }}',
             base: 'master',
             body: [
-              'Would you like to release a new build of `aproxyrelay` ?\n',
+              'Would you like to release a new build of aproxyrelay ?\n',
               'Update A Proxy Relay to latest',
               '---',
               'Build and release new version!',
