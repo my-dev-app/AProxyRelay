@@ -132,4 +132,3 @@ jobs:
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
           tag: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
-
