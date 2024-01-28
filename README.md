@@ -127,7 +127,7 @@ To contribute your own proxy scraper, follow these steps:
         }
         queue.put(data)
         ```
-4. ### Convratulations
+4. ### Congratulations
     - If done correctly, congratulations! You've successfully created a new proxy parser for this library.
     - Add the targeted link and your scraper to `scrapers/__init__.py`.
 
