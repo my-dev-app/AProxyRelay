@@ -127,7 +127,8 @@ class AProxyRelayCore(AProxyRelayProcessor):
 
         while not self._queue_to_validate.empty():
             data = self._queue_to_validate.get()
-            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{data["port"]}' if len(str(data['port'])) > 0 else ''}"  # noqa: B950, E999
+            port = str(data["port"])
+            ip = f"{data['protocol'].replace('https', 'http')}://{data['ip']}{f':{port}' if len(str(port)) > 0 else ''}"
             tasks.append(self._test_proxy_link(ip, data))
 
         # Wait for all requests to complete

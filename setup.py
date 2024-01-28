@@ -12,6 +12,18 @@ setup(
         'aiosocks2',
         'beautifulsoup4',
     ],
+    extras_require={
+        'dev': [
+            'flake8-bugbear',
+            'pytest',
+            'pytest-cov',
+            'pytest-django',
+            'pytest-sugar',
+            'pytest-xdist',
+            'setuptools',
+            'wheel',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'myproject-cli = myproject.module1:main',
