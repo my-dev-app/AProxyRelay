@@ -118,7 +118,7 @@ jobs:
           python3.11 -m build
           python3.11 -m twine upload --repository pypi dist/*
         env:
-          CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}+${{ steps.date.outputs.date }}
+          CUSTOM_VERSION: 1.${{ github.run_number }}.${{ github.run_attempt }}.rc${{ github.run_id }}
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_RELEASE_TOKEN }}
 
