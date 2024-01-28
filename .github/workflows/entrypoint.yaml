@@ -1,0 +1,77 @@
+# This is the main file of the github action workflow,
+name: A Proxy Relay build
+run-name: ${{ github.actor }} Opened ${{ github.ref }}
+on:
+  # Trigger build(s) on specified branch, git action:
+  pull_request:
+    types: [opened, closed, synchronize]
+    branches: 
+      - 'development'
+      - 'master'
+
+jobs:
+  UpdatePR:
+    uses: ./.github/workflows/update_pr.yaml
+    secrets: inherit
+
+  updateMasterPR:
+    runs-on: self-hosted
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged && github.ref != 'master' && github.ref != 'refs/heads/master'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - id: string
+      uses: ASzc/change-string-case-action@v5
+      with:
+        string: ${{github.event.repository.name}}
+    - name: Create Pull Request
+      id: cpr
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { repo, owner } = context.repo;
+          const result = await github.rest.pulls.create({
+            title: 'Build Request - ${{ github.run_number }} | A Proxy Relay Package',
+            owner,
+            repo,
+            head: '${{ github.ref_name }}',
+            base: 'master',
+            body: [
+              'Request A Proxy Relay deployment',
+              'Update A Proxy Relay to latest',
+              '---',
+              'Build and release new version!',
+            ].join('\n'),
+            assignees: '@0x78f1935',
+            reviewers: '@0x78f1935',
+          });
+          github.rest.issues.addLabels({
+            owner,
+            repo,
+            issue_number: result.data.number,
+            labels: ['docker', 'automated', 'prod-deployment'],
+          });
+          const os = require("os");
+          const fs = require("fs");
+
+          function setOutput(key, value) {
+            // Temporary hack until core actions library catches up with github new recommendations
+            const output = process.env['GITHUB_OUTPUT']
+            fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
+          };
+          setOutput('pr_id', result.data.number);
+
+  deploy-production-docker-image:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'prod-deployment')
+    timeout-minutes: 30
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - id: string
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{github.event.repository.name}}

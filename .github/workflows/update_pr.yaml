@@ -1,0 +1,18 @@
+name: Update PR
+run-name: Updating PR ${{ github.ref }}
+on:
+  # File is triggered by the main pipeline
+  workflow_call:
+
+jobs:
+  UpdatePR:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'opened'
+    runs-on: self-hosted
+    steps:
+    - name: Add assignee to PR
+      uses: hkusu/review-assign-action@v1.3.1
+      with:
+        # assignees: ${{ github.actor }}
+        reviewers: '0x78f1935'
