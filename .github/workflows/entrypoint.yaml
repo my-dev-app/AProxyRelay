@@ -107,6 +107,7 @@ jobs:
       - name: Build package
         run: python3.11 setup.py sdist bdist_wheel
       - name: Create a Release
+        id: release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl.txt"
