@@ -14,3 +14,26 @@ proxy_relay = AProxyRelay(
 )
 data = proxy_relay.start()
 print(data.qsize())
+
+proxy_relay = AProxyRelay(
+    targets=targets,
+    timeout=5,
+    test_proxy=True,
+    test_timeout=10,
+    zone='nl',
+    steam=False
+)
+data = proxy_relay.start()
+print(data.qsize())
+
+proxy_relay = AProxyRelay(
+    targets=targets,
+    timeout=5,
+    test_proxy=True,
+    test_timeout=10,
+    zone='de',
+    steam=False
+)
+data = proxy_relay.start()
+print(data.qsize())
+

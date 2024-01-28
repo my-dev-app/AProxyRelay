@@ -14,6 +14,7 @@ Makes scraping API's easy and fun.
 """
 import asyncio
 from datetime import datetime, UTC
+from queue import Queue
 
 import logging
 
@@ -21,12 +22,27 @@ from .core import AProxyRelayCore
 
 
 class AProxyRelay(AProxyRelayCore):
-    def __init__(self, targets: list[str], timeout: int = 5, test_proxy: bool = True, test_timeout: int = 20, zone: str = 'us', debug: bool = False, steam: bool = False) -> None:
+    def __init__(
+            self,
+            targets: list[str] = [],
+            timeout: int = 5,
+            test_proxy: bool = True,
+            test_timeout: int = 20,
+            zone: str = 'us',
+            debug: bool = False,
+            steam: bool = False
+        ) -> None:
         """
+        Initialize an instance of AProxyRelay.
+
         Args:
-            targets list[str]: Target URL's to obtain data from
-            timeout int: amount of time in seconds before a connection is cancelled if not succeeded
-            test_proxy bool: When True, test proxy connections before utilizing them
+            targets (list[str]): Target URL's to obtain data from.
+            timeout (int): Amount of time in seconds before a connection is cancelled if not succeeded.
+            test_proxy (bool): When True, test proxy connections before utilizing them.
+            test_timeout (int): Timeout for testing proxy connections in seconds.
+            zone (str): Zone identifier, e.g., 'us', 'nl', 'de', 'uk', etc etc.
+            debug (bool): Enable debug mode if True.
+            steam (bool): Enable Steam mode if True.
         """
         # Configure the logger
         logging.basicConfig(level=logging.INFO if not debug else logging.DEBUG)
@@ -45,17 +61,23 @@ class AProxyRelay(AProxyRelayCore):
         for item in targets:
             self._queue_target_process.put(item)
 
-    async def _main(self) -> list:
+    async def _main(self) -> Queue:
         """
-        Starts scrape task, once finised, you will endup with the data from the api in an array.
+        Start the scrape task asynchronously. Once finished, you will end up with the data from the API in a Queue.
+
+        Returns:
+            Queue: A queue containing the scraped data from the API.
         """
         await self.get_proxies()
         await self.process_targets()
         return self._queue_result
 
-    def start(self) -> list:
+    def start(self) -> Queue:
         """
-        Start asynchronious scraping, returns results in Array format
+        Start asynchronous scraping and return the results in a List format.
+
+        Returns:
+            Queue: A queue containing the scraped data from the API.
         """
         started = datetime.now(UTC)
         self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')

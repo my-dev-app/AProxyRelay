@@ -25,12 +25,14 @@ from .process import AProxyRelayProcessor
 
 
 class AProxyRelayCore(AProxyRelayProcessor):
-# class AProxyRelayCore(object):
     """
-    Core which manage proxies and scraped links.
-    Designed for speed and to bypass api limiters.
+    Core class that manages proxies and scraped links.
+    Designed for speed and to bypass API limiters.
     """
     def __init__(self) -> None:
+        """
+        Initialize an instance of AProxyRelayCore.
+        """
         # Initialize class for user agents
         # User agents are important for tricking connections we are requesting from different devices
         self._agents = UserAgents()
@@ -46,22 +48,31 @@ class AProxyRelayCore(AProxyRelayProcessor):
         AProxyRelayProcessor.__init__(self)
     
     async def get_proxies(self) -> None:
-        """Fill the self.proxies queue with fresh proxies"""
+        """
+        Asynchronously fill the self.proxies queue with fresh proxies.
+        """
         await self._process()
     
     async def process_targets(self) -> None:
-        """Process targets with available proxies"""
+        """
+        Asynchronously process targets with available proxies.
+        """
         await self._process_targets_main()
 
     def _get_header(self) -> dict:
-        """Obtain random user-agent header"""
+        """
+        Obtain a random user-agent header.
+
+        Returns:
+            dict: A dictionary containing the user-agent header.
+        """
         return {
             'User-Agent': self._agents.random()
         }
     
-    async def _process(self):
+    async def _process(self) -> None:
         """
-        Process library
+        Asynchronously process the library.
         """
         started = datetime.now(UTC)
         for item in proxy_list:
@@ -81,8 +92,13 @@ class AProxyRelayCore(AProxyRelayProcessor):
         
         self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - started}, Please wait...')
 
-    async def _request_scraper_page(self, url):
-        """Fetch URL and execute the pre-coded scraper for that specific website"""
+    async def _request_scraper_page(self, url) -> None:
+        """
+        Asynchronously fetch a URL and execute the pre-coded scraper for that specific website.
+
+        Args:
+            url: The URL to be fetched and processed.
+        """
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
             # try:
             # Make your asynchronous request here
@@ -102,8 +118,10 @@ class AProxyRelayCore(AProxyRelayProcessor):
             # except Exception as e:
             #     self.logger.info(f"Request for URL {url} failed with error: {e}")
 
-    async def _test_proxies(self):
-        """Test all scraped proxies, working proxies will be put into the results variable of the core"""
+    async def _test_proxies(self) -> None:
+        """
+        Asynchronously test all scraped proxies. Working proxies will be put into the 'results' variable of the core.
+        """
         # Create a list to hold the tasks for making asynchronous requests
         tasks = []
 
@@ -115,8 +133,15 @@ class AProxyRelayCore(AProxyRelayProcessor):
         # Wait for all requests to complete
         await asyncio.gather(*tasks)
 
-    async def _test_proxy_link(self, proxy_url, data):
-        """Calls gg.my-dev.app, website build by the creator of this package. If the connection was successful, the proxy works!"""
+    async def _test_proxy_link(self, proxy_url, data) -> None:
+        """
+        Asynchronously call gg.my-dev.app, a website built by the creator of this package.
+        If the connection was successful, the proxy works!
+        
+        Args:
+            proxy_url: The URL of the proxy to be tested.
+            data: Additional data for the proxy test.
+        """
         conn = ProxyConnector(remote_resolve=True)
 
         async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.test_timeout) as session:
@@ -134,5 +159,4 @@ class AProxyRelayCore(AProxyRelayProcessor):
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:
-                # self.logger.error(f"Proxy request failed with error: {e}")
-                pass
+                self.logger.debug(f"Proxy request failed with error: {e}")

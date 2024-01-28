@@ -21,14 +21,18 @@ import aiohttp
 
 class AProxyRelayProcessor(object):
     def __init__(self) -> None:
+        """
+        Initialize an instance of AProxyRelayProcessor.
+        """
         self._queue_target_process = Queue()  # holds targets
         self._queue_result = Queue()  # Holds target results
 
-    async def _process_targets_main(self):
-        """Start of the Proxy Relay Processor, proxies in the queue are nothing less then burners. When they fail, we 
-        delete them from memory. Once the proxy queue is empty, we look for new proxies before we continue with our targets
+    async def _process_targets_main(self) -> None:
         """
-        started = datetime.now(UTC)
+        Start the Proxy Relay Processor. Proxies in the queue are nothing less than burners.
+        When they fail, we delete them from memory. Once the proxy queue is empty, we look for new proxies
+        before we continue with our targets.
+        """
         tasks = []
         while not self._queue_target_process.empty():
             proxy = self.proxies.get()
@@ -54,8 +58,15 @@ class AProxyRelayProcessor(object):
         elif not self.proxies.empty() and self._queue_target_process.qsize() > 0:
             await self.process_targets()
 
-    async def _fetch_targets(self, target: str, proxy_url: str):
-        """Calls gg.my-dev.app, website build by the creator of this package. If the connection was successful, the proxy works!"""
+    async def _fetch_targets(self, target: str, proxy_url: str) -> None:
+        """
+        Asynchronously fetch the targets with our proxies.
+        The 'steam' variable should be defaulted to False and should only be used when targeting Steam.
+
+        Args:
+            target: The target URL to be fetched.
+            proxy_url: The URL of the proxy to be used for the request.
+        """
         conn = ProxyConnector(remote_resolve=True)
 
         async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:
@@ -72,5 +83,5 @@ class AProxyRelayProcessor(object):
                     else:
                         self._queue_target_process.put(target)
             except Exception as e:
-                # self.logger.info(f"Proxy request failed with error: {e}")
+                self.logger.debug(f"Proxy request failed with error: {e}")
                 self._queue_target_process.put(target)

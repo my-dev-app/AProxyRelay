@@ -15,6 +15,9 @@ from random import choice
 
 class UserAgents(object):
     def __init__(self) -> None:
+        """
+        Initialize an instance of UserAgents.
+        """
         self.agents = [
             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.94 Chrome/37.0.2062.94 Safari/537.36',
             'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36',
@@ -1018,6 +1021,11 @@ class UserAgents(object):
             'Mozilla/5.0 (iPhone; CPU iPhone OS 8_4 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) GSA/7.0.55539 Mobile/12H143 Safari/600.1.4',
         ]
     
-    def random(self):
-        """Returns random user agent"""
+    def random(self) -> str:
+        """
+        Returns a random user agent.
+
+        Returns:
+            str: A randomly selected user agent string.
+        """
         return choice(self.agents)
