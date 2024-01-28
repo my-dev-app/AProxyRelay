@@ -19,6 +19,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'build',
             'flake8-bugbear',
             'pytest',
             'pytest-cov',
@@ -26,6 +27,7 @@ setup(
             'pytest-sugar',
             'pytest-xdist',
             'setuptools',
+            'twine',
             'wheel',
         ],
     },
