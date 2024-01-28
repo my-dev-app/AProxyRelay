@@ -10,6 +10,9 @@
 By undeƒined
 -------------------------------------
 ```
+[![PyPI version](https://badge.fury.io/py/aproxyrelay.svg)](https://badge.fury.io/py/aproxyrelay)
+[![A Proxy Relay build](https://github.com/my-dev-app/proxy-relay/actions/workflows/entrypoint.yaml/badge.svg?branch=development)](https://github.com/my-dev-app/proxy-relay/actions/workflows/entrypoint.yaml)
+
 # AProxyRelay: An Async Request Library with Proxy Rotation
 
 AProxyRelay is an asynchronous request library designed for easy data retrieval using various proxy servers. It seamlessly handles proxy rotation, preserves data that fails to be requested, and simplifies API scraping. The library is written in `Python 3.12.1` but is compatible with projects utilizing `Python 3.11.2`.
