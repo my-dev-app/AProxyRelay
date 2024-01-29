@@ -5,23 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Test: Start File",
+            "name": "Start: Example",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/start.py",
+            "program": "${workspaceFolder}/example.py",
             "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Test: Targeted",
-            "type": "python",
-            "request": "launch",
-            "module": "pytest",
-            "args": [
-                "test",
-                "tests.test_class_initialization",
-            ],
-            "django": true,
             "justMyCode": true
         },
         {
@@ -29,10 +17,6 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-
-            "env": {
-                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
-            },
             "justMyCode": true
         },
     ]
