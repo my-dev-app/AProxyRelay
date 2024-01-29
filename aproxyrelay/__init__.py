@@ -54,7 +54,6 @@ class AProxyRelay(AProxyRelayCore):
         self.test_proxy = test_proxy
         self.zone = zone
         self.debug = debug
-
         self._steam = steam
 
         AProxyRelayCore.__init__(self)
@@ -82,16 +81,19 @@ class AProxyRelay(AProxyRelayCore):
         started = datetime.now(UTC)
         self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.ProactorEventLoop()
         loop.set_debug(self.debug)
 
-        # Create a task and set its name
-        task = loop.create_task(self._main())
-        task.set_name("AProxyRelay")
+        try:
+            # Create a task and set its name
+            task = loop.create_task(self._main())
+            task.set_name("AProxyRelay")
 
-        loop.run_until_complete(task)
-        self.logger.info(f'Data scraped! Took {datetime.now(UTC) - started}, enjoy!')
+            loop.run_until_complete(task)
+            self.logger.info(f'Data scraped! Took {datetime.now(UTC) - started}, enjoy!')
 
-        result = task.result()
-        loop.close()
+            result = task.result()
+        finally:
+            loop.close()
+
         return result

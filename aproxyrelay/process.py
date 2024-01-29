@@ -44,11 +44,7 @@ class AProxyRelayProcessor(object):
             self.proxies.put(proxy)
 
         # Wait for all requests to complete
-        try:
-            await asyncio.gather(*tasks)
-        except Exception as e:
-            print(e)
-
+        await asyncio.gather(*tasks)
         self.logger.info(f'Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
 
         if self.proxies.empty() and self._queue_target_process.qsize() > 0:
