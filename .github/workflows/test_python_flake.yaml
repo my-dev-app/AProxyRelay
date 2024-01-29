@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3.11 -m pip install --upgrade pip
-          python3.11 -m pip install -r requirements.txt --use-pep517
+          python3.11 -m pip install -e .[dev] --use-pep517
       - name: Check code style
         run: |
           python3.11 -m flake8

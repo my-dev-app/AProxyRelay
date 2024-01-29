@@ -23,7 +23,6 @@ setup(
             'flake8-bugbear',
             'pytest',
             'pytest-cov',
-            'pytest-django',
             'pytest-sugar',
             'pytest-xdist',
             'setuptools',
