@@ -91,4 +91,7 @@ class AProxyRelay(AProxyRelayCore):
 
         loop.run_until_complete(task)
         self.logger.info(f'Data scraped! Took {datetime.now(UTC) - started}, enjoy!')
-        return task.result()
+
+        result = task.result()
+        loop.close()
+        return result
