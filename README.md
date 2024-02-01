@@ -122,7 +122,6 @@ To contribute your own proxy scraper, follow these steps:
     - Your goal is to format the data in the `format_data` method and place it into the provided Queue. The data should be structured as follows:
         ```python
         data = {
-            "country": "US",
             "zone": "US",
             "method": "http",
             "anonymity": "anonymous",

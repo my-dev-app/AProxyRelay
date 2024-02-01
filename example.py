@@ -2,21 +2,15 @@
 from aproxyrelay import AProxyRelay
 
 # Note: Duplicates will be removed by the library
-targets = [
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=us&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=de&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=de&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=100&type=example',
-]
+targets = []
 
 # Initialize proxy relay
 proxy_relay = AProxyRelay(
     targets=targets,
     timeout=5,
-    test_proxy=True,
+    test_proxy=False,
     test_timeout=10,
-    zone='de',
+    zone='DE',
 )
 
 # Fetch data
