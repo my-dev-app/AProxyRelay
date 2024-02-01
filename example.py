@@ -17,6 +17,7 @@ proxy_relay = AProxyRelay(
     test_proxy=True,
     test_timeout=10,
     zone='US',
+    debug=False
 )
 
 # Fetch data

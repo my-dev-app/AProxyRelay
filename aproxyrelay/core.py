@@ -76,6 +76,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
         """
         started = datetime.now(UTC)
         for item in proxy_list:
+            self.logger.info(f'Loading: {item["parser"].__name__}')
             if item['url'].startswith('https://gg.my-dev.app/'):
                 # Sharing is caring
                 if self.test_proxy:
@@ -110,7 +111,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
             target_url = await parser.format_url(url, self.zone)
             async with session.get(target_url, headers=self._get_header()) as response:
                 # Process the response as needed
-                self.logger.debug(f"URL: {await parser.format_url(url, zone=self.zone)}, Status Code: {response.status}")
+                self.logger.info(f"URL: {await parser.format_url(url, zone=self.zone)}, Status Code: {response.status}")
                 if response.status == 200:
                     new_queue = await parser.scrape(self.zone, response)
                     while not new_queue.empty():
@@ -162,7 +163,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
                     },
                     data=json.dumps(data)
                 ) as response:
-                    self.logger.debug(f"Proxy usage -> Status Code: {response.status}")
+                    self.logger.info(f"Proxy usage -> Status Code: {response.status}")
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:

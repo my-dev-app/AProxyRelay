@@ -15,7 +15,7 @@ from queue import Queue
 from .parser import MainScraper
 
 
-class ParserMultiProxy(MainScraper):
+class ParserMonoSans(MainScraper):
     def __init__(self) -> None:
         MainScraper.__init__(self)
         self.zone = None
@@ -32,9 +32,9 @@ class ParserMultiProxy(MainScraper):
         return [
             {
                 'zone': cls.zone.upper(),
-                'method': 'http',
-                'anonymity': 'unknown',
-                'protocol': 'http',
+                'method': 'socks4',
+                'anonymity': 'anonymous',
+                'protocol': 'socks4',
                 'port': item.split(':')[1],
                 'ip': item.split(':')[0],
             } for item in html.split('\n') if item
