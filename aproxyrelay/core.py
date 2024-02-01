@@ -76,7 +76,13 @@ class AProxyRelayCore(AProxyRelayProcessor):
         """
         started = datetime.now(UTC)
         for item in proxy_list:
-            self._queue_scrape_urls.put(item['url'])
+            self.logger.info(f'Loading: {item["parser"].__name__}')
+            if item['url'].startswith('https://gg.my-dev.app/'):
+                # Sharing is caring
+                if self.test_proxy:
+                    self._queue_scrape_urls.put(item['url'])
+            else:
+                self._queue_scrape_urls.put(item['url'])
 
         # For each parser, fetch the URL related to it
         task_request_proxy_list = []
@@ -100,13 +106,12 @@ class AProxyRelayCore(AProxyRelayProcessor):
             url: The URL to be fetched and processed.
         """
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
-            # try:
-            # Make your asynchronous request here
+            # Make asynchronous request here
             parser = [p for p in proxy_list if p['url'] == url][0]['parser']
             target_url = await parser.format_url(url, self.zone)
             async with session.get(target_url, headers=self._get_header()) as response:
                 # Process the response as needed
-                self.logger.debug(f"URL: {await parser.format_url(url, zone=self.zone)}, Status Code: {response.status}")
+                self.logger.info(f"URL: {await parser.format_url(url, zone=self.zone)}, Status Code: {response.status}")
                 if response.status == 200:
                     new_queue = await parser.scrape(self.zone, response)
                     while not new_queue.empty():
@@ -115,8 +120,6 @@ class AProxyRelayCore(AProxyRelayProcessor):
                             self._queue_to_validate.put(row)
                         else:
                             self.proxies.put(row)
-            # except Exception as e:
-            #     self.logger.info(f"Request for URL {url} failed with error: {e}")
 
     async def _test_proxies(self) -> None:
         """
@@ -160,7 +163,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
                     },
                     data=json.dumps(data)
                 ) as response:
-                    self.logger.debug(f"Proxy usage -> Status Code: {response.status}")
+                    self.logger.info(f"Proxy usage -> Status Code: {response.status}")
                     if response.status == 200:
                         self.proxies.put(data)
             except Exception as e:

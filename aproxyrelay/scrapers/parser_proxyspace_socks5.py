@@ -10,54 +10,38 @@ By undeƒined
 
 Main parser example, other parsers can inherit from this class
 """
-from bs4 import BeautifulSoup
 from queue import Queue
 
 from .parser import MainScraper
 
 
-class ParserSocksProxy(MainScraper):
+class ParserProxySpaceSocks5(MainScraper):
     def __init__(self) -> None:
         MainScraper.__init__(self)
+        self.zone = None
 
     @classmethod
     async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
+        cls.zone = zone
         return url
 
     @classmethod
     async def format_raw(cls, html: str) -> list:
         """Parse text/html pages, customized method for the parser of this website"""
-        results = []
-        soup = BeautifulSoup(html, "html.parser")
-
-        # Find the table with the given structure
-        table = soup.find("table", {"class": "table table-striped table-bordered"})
-
-        if table:
-            # Extract headers from the table
-            headers = [header.text.strip() for header in table.find_all("th")]
-
-            # Extract data from the rows
-            rows = table.find_all("tr")[1:]  # Skip the first row (header row)
-            for row in rows:
-                row_data = [data.text.strip() for data in row.find_all("td")]
-
-                # Combine headers with row data and create a dictionary
-                data_dict = dict(zip(headers, row_data, strict=True))
-                results.append(data_dict)
-        return results
+        return [
+            {
+                'zone': cls.zone.upper(),
+                'method': 'socks5',
+                'anonymity': 'unknown',
+                'protocol': 'socks5',
+                'port': item.split(':')[1],
+                'ip': item.split(':')[0],
+            } for item in html.split('\n') if item
+        ]
 
     @classmethod
     async def format_data(cls, zone: str, data: dict, queue: Queue) -> None:
         """Data formatter, formats data and returns is back in the process Queue"""
-        if data['Code'] == zone.upper():
-            queue.put({
-                'zone': data['Code'],
-                'method': data['Version'].lower(),
-                'anonymity': 'anonymous' if data['Anonymity'].lower() in ['elite', 'anonymous', 'elite proxy'] else 'transparent',
-                'protocol': data['Version'].lower(),
-                'port': str(data['Port']),
-                'ip': data['IP Address'],
-            })
+        queue.put(data)
         return queue

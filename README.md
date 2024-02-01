@@ -10,8 +10,11 @@
 By undeƒined
 -------------------------------------
 ```
-[![PyPI version](https://badge.fury.io/py/aproxyrelay.svg)](https://badge.fury.io/py/aproxyrelay)
-[![A Proxy Relay build](https://github.com/my-dev-app/proxy-relay/actions/workflows/entrypoint.yaml/badge.svg?branch=development)](https://github.com/my-dev-app/proxy-relay/actions/workflows/entrypoint.yaml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/my-dev-app/proxy-relay/entrypoint.yaml?branch=development)
+![PyPI - Version](https://img.shields.io/pypi/v/aproxyrelay)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/aproxyrelay)
+![GitHub commits since latest release](https://img.shields.io/github/commits-since/my-dev-app/proxy-relay/latest)
+![GitHub Repo stars](https://img.shields.io/github/stars/my-dev-app/proxy-relay?style=social)
 
 # AProxyRelay: An Async Request Library with Proxy Rotation
 
@@ -119,7 +122,6 @@ To contribute your own proxy scraper, follow these steps:
     - Your goal is to format the data in the `format_data` method and place it into the provided Queue. The data should be structured as follows:
         ```python
         data = {
-            "country": "US",
             "zone": "US",
             "method": "http",
             "anonymity": "anonymous",
@@ -143,4 +145,18 @@ python setup.py sdist bdist_wheel
 ```
 
 This will generate the package in the `dist` folder.
-Note: A version can be set with the environment variable `CUSTOM_VERSION`
+
+***Note: A custom version can be set with the environment variable `CUSTOM_VERSION`***
+
+## Versioning
+The version public on [PyPi](https://pypi.org/project/aproxyrelay/) contains a version number based on the pipeline builds and looks like:
+
+    ` aproxyrelay 1.104.1rc7696232336 `
+
+Breaking the version down:
+
+-  `aproxyrelay`: The name of the package
+-  `1`: Major version
+-  `104`: Build number
+-  `1`: Build retry number
+-  `rc7696232336`: Random build number
