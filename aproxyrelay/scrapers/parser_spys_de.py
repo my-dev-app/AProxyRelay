@@ -47,7 +47,6 @@ class ParserSpysDE(MainScraper):
                     'Proxy': None if not cells[0].find('font', class_='spy14') else cells[0].find('font', class_='spy14').text.strip(),  # noqa: B950
                     'Type': None if not cells[1].find('font', class_='spy1') else cells[1].find('font', class_='spy1').text.strip(),  # noqa: B950
                     'Anonymity': None if not cells[2].find('font', class_='spy5') else cells[2].find('font', class_='spy5').text.strip(),  # noqa: B950
-                    'Country': None if not cells[3].find('font', class_='spy14') else cells[3].find('font', class_='spy14').text.strip(),  # noqa: B950
                     'Hostname/ORG': None if not cells[4].find('font', class_='spy1') else cells[4].find('font', class_='spy1').text.strip(),  # noqa: B950
                     'Latency': None if not cells[5].find('font', class_='spy1') else cells[5].find('font', class_='spy1').text.strip(),  # noqa: B950
                     'Speed': None if not cells[6].find('font', class_='spy1') else cells[6].find('font', class_='spy1').text.strip(),  # noqa: B950
@@ -64,7 +63,6 @@ class ParserSpysDE(MainScraper):
         """Data formatter, formats data and returns is back in the process Queue"""
         if zone.upper() == 'DE':
             queue.put({
-                'country': 'Germany',
                 'zone': 'DE',
                 'method': 'http' if data['Type'] is None else data['Type'].lower(),
                 'anonymity': 'anonymous' if data['Anonymity'] is not None else 'transparent',

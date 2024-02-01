@@ -55,7 +55,6 @@ class ScraperCore(object):
         Formats queue into a pre-set json scheme
 
         {
-            'country': str,
             'zone': str,
             'method': str['http', 'https', 'socks4', 'socks5', 'unknown',],
             'anonymity': str['anonymous', 'transparent',],

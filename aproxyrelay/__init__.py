@@ -53,7 +53,7 @@ class AProxyRelay(AProxyRelayCore):
         self.timeout = timeout
         self.test_timeout = test_timeout
         self.test_proxy = test_proxy
-        self.zone = zone
+        self.zone = zone.upper()
         self.debug = debug
         self._steam = steam
 
