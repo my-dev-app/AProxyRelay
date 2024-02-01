@@ -76,7 +76,12 @@ class AProxyRelayCore(AProxyRelayProcessor):
         """
         started = datetime.now(UTC)
         for item in proxy_list:
-            self._queue_scrape_urls.put(item['url'])
+            if item['url'].startswith('https://gg.my-dev.app/'):
+                # Sharing is caring
+                if self.test_proxy:
+                    self._queue_scrape_urls.put(item['url'])
+            else:
+                self._queue_scrape_urls.put(item['url'])
 
         # For each parser, fetch the URL related to it
         task_request_proxy_list = []
@@ -100,8 +105,7 @@ class AProxyRelayCore(AProxyRelayProcessor):
             url: The URL to be fetched and processed.
         """
         async with aiohttp.ClientSession(conn_timeout=self.timeout) as session:
-            # try:
-            # Make your asynchronous request here
+            # Make asynchronous request here
             parser = [p for p in proxy_list if p['url'] == url][0]['parser']
             target_url = await parser.format_url(url, self.zone)
             async with session.get(target_url, headers=self._get_header()) as response:
@@ -115,8 +119,6 @@ class AProxyRelayCore(AProxyRelayProcessor):
                             self._queue_to_validate.put(row)
                         else:
                             self.proxies.put(row)
-            # except Exception as e:
-            #     self.logger.info(f"Request for URL {url} failed with error: {e}")
 
     async def _test_proxies(self) -> None:
         """
