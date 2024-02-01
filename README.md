@@ -14,6 +14,7 @@ By undeƒined
 ![PyPI - Version](https://img.shields.io/pypi/v/aproxyrelay)
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/aproxyrelay)
 ![GitHub commits since latest release](https://img.shields.io/github/commits-since/my-dev-app/proxy-relay/latest)
+![GitHub Repo stars](https://img.shields.io/github/stars/my-dev-app/proxy-relay?style=social)
 
 # AProxyRelay: An Async Request Library with Proxy Rotation
 
@@ -121,7 +122,6 @@ To contribute your own proxy scraper, follow these steps:
     - Your goal is to format the data in the `format_data` method and place it into the provided Queue. The data should be structured as follows:
         ```python
         data = {
-            "country": "US",
             "zone": "US",
             "method": "http",
             "anonymity": "anonymous",

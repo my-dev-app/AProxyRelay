@@ -17,6 +17,7 @@ from datetime import datetime, UTC
 from queue import Queue
 
 import logging
+import sys
 
 from .core import AProxyRelayCore
 
@@ -52,7 +53,7 @@ class AProxyRelay(AProxyRelayCore):
         self.timeout = timeout
         self.test_timeout = test_timeout
         self.test_proxy = test_proxy
-        self.zone = zone
+        self.zone = zone.upper()
         self.debug = debug
         self._steam = steam
 
@@ -68,7 +69,10 @@ class AProxyRelay(AProxyRelayCore):
             Queue: A queue containing the scraped data from the API.
         """
         await self.get_proxies()
-        await self.process_targets()
+        if self.proxies.qsize() > 0:
+            await self.process_targets()
+        else:
+            self.logger.error('Could not establish any available proxy! Please try again later.')
         return self._queue_result
 
     def start(self) -> Queue:
@@ -81,7 +85,10 @@ class AProxyRelay(AProxyRelayCore):
         started = datetime.now(UTC)
         self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')
 
-        loop = asyncio.ProactorEventLoop()
+        if sys.platform == "win32":
+            loop = asyncio.ProactorEventLoop()
+        else:
+            loop = asyncio.SelectorEventLoop()
         loop.set_debug(self.debug)
 
         try:

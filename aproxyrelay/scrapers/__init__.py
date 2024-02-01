@@ -13,7 +13,11 @@ Proxy list and their mapped scrapers
 from .parser_freeproxylist import ParserFreeProxyList
 from .parser_gg_my_dev_app import ParserGGMyDevApp
 from .parser_lumiproxy import ParserLumiProxy
+from .parser_multiproxy import ParserMultiProxy
+from .parser_monosans_anonymous import ParserMonoSans
+from .parser_proxyscrape_http import ParserProxyScrapeHttp
 from .parser_proxyscrape import ParserProxyScrape
+from .parser_proxyspace_socks5 import ParserProxySpaceSocks5
 from .parser_socks_proxy import ParserSocksProxy
 from .parser_spys_de import ParserSpysDE
 from .parser_spys_nl import ParserSpysNL
@@ -27,7 +31,7 @@ proxy_list = [
         'parser': ParserFreeProxyList,
     },
     {
-        'url': 'https://api.lumiproxy.com/web_v1/free-proxy/list?page_size=10000&page=1&country_code=nl',
+        'url': 'https://api.lumiproxy.com/web_v1/free-proxy/list?page_size=1000&page=1&country_code=nl',
         'parser': ParserLumiProxy,
     },
     {
@@ -35,8 +39,24 @@ proxy_list = [
         'parser': ParserProxyScrape,
     },
     {
+        'url': 'https://raw.githubusercontent.com/monosans/proxy-list/main/proxies_anonymous/socks4.txt',
+        'parser': ParserMonoSans,
+    },
+    {
+        'url': 'https://multiproxy.org/txt_all/proxy.txt',
+        'parser': ParserMultiProxy,
+    },
+    {
+        'url': 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=1000&country=NL&ssl=all&anonymity=all',  # noqa: B950
+        'parser': ParserProxyScrapeHttp,
+    },
+    {
         'url': 'https://socks-proxy.net/',
         'parser': ParserSocksProxy,
+    },
+    {
+        'url': 'https://proxyspace.pro/socks5.txt',
+        'parser': ParserProxySpaceSocks5,
     },
     {
         'url': 'https://spys.one/free-proxy-list/DE/',

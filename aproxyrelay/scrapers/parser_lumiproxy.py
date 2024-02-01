@@ -31,7 +31,6 @@ class ParserLumiProxy(MainScraper):
         for item in data['data']['list']:
             if item['country_code'] == zone.upper():
                 queue.put({
-                    'country': item['name_en'],
                     'zone': item['country_code'],
                     'method': cls._get_protocol(item['protocol']),
                     'anonymity': 'transparent' if item['anonymity'] not in [1, 2] else 'anonymous',

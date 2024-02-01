@@ -53,7 +53,6 @@ class ParserSSLProxies(MainScraper):
         """Data formatter, formats data and returns is back in the process Queue"""
         if data['Code'] == zone.upper():
             queue.put({
-                'country': data['Country'],
                 'zone': data['Code'],
                 'method': 'https',
                 'anonymity': 'anonymous' if data['Anonymity'].lower() in ['elite', 'anonymous', 'elite proxy'] else 'transparent',

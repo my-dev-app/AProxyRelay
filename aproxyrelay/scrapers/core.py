@@ -30,6 +30,9 @@ class ScraperCore(object):
         elif response.content_type == 'text/html':
             data = await response.text()
             data = await cls.format_raw(data)
+        elif response.content_type == 'text/plain':
+            data = await response.content.read()
+            data = await cls.format_raw(data.decode())
         else:
             raise ReferenceError(f'None exiting content type for parser: {response.content_type}')
         queue = await cls._flatten_response(data)
@@ -52,7 +55,6 @@ class ScraperCore(object):
         Formats queue into a pre-set json scheme
 
         {
-            'country': str,
             'zone': str,
             'method': str['http', 'https', 'socks4', 'socks5', 'unknown',],
             'anonymity': str['anonymous', 'transparent',],

@@ -3,11 +3,11 @@ from aproxyrelay import AProxyRelay
 
 # Note: Duplicates will be removed by the library
 targets = [
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=us&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=de&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=de&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=US&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=DE&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=NL&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=CA&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=AU&anonimity=all&protocol=all&page=1&size=100&type=example',
 ]
 
 # Initialize proxy relay
@@ -16,7 +16,8 @@ proxy_relay = AProxyRelay(
     timeout=5,
     test_proxy=True,
     test_timeout=10,
-    zone='de',
+    zone='US',
+    debug=False
 )
 
 # Fetch data
