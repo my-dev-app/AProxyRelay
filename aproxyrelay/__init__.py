@@ -17,6 +17,7 @@ from datetime import datetime, UTC
 from queue import Queue
 
 import logging
+import sys
 
 from .core import AProxyRelayCore
 
@@ -81,7 +82,10 @@ class AProxyRelay(AProxyRelayCore):
         started = datetime.now(UTC)
         self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')
 
-        loop = asyncio.ProactorEventLoop()
+        if sys.platform == "win32":
+            loop = asyncio.ProactorEventLoop()
+        else:
+            loop = asyncio.SelectorEventLoop()
         loop.set_debug(self.debug)
 
         try:
