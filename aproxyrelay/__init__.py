@@ -69,7 +69,10 @@ class AProxyRelay(AProxyRelayCore):
             Queue: A queue containing the scraped data from the API.
         """
         await self.get_proxies()
-        await self.process_targets()
+        if self.proxies.qsize() > 0:
+            await self.process_targets()
+        else:
+            self.logger.error('Could not establish any available proxy! Please try again later.')
         return self._queue_result
 
     def start(self) -> Queue:
