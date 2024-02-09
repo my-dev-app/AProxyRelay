@@ -28,7 +28,7 @@ class AProxyRelay(AProxyRelayCore):
         timeout: int = 5,
         scrape: bool = True,
         filter: bool = True,
-        zone: list[str] = ['US'],  # noqa: B006
+        zones: list[str] = ['US'],  # noqa: B006
         unpack: Callable = lambda data, target: data,
         debug: bool = False,
     ) -> None:
@@ -51,16 +51,18 @@ class AProxyRelay(AProxyRelayCore):
                     timeout=5,
                     scrape=True,
                     filter=True,
-                    zone=['US', 'DE'],
+                    zones=['US', 'DE'],
                     unpack=lambda data, target: data[target.split('appids=')[1]]['success'],
                     debug=True,
                 )
             ```
         """
-        AProxyRelayCore.__init__(self)
         # Configure the logger
         basicConfig(level=INFO if not debug else DEBUG)
         self.logger = getLogger(__name__)
+
+        # Initialize Core
+        AProxyRelayCore.__init__(self)
 
         # TODO raise exceptions for class arguments
         self._queue_target_process = Queue(maxsize=len(targets))
@@ -70,7 +72,7 @@ class AProxyRelay(AProxyRelayCore):
         self.timeout = timeout
         self.scrape = scrape
         self.filter = filter
-        self.zones = zone
+        self.zones = [z.upper() for z in zones]
         self.unpack = unpack
         self.debug = debug
         self.started = None
