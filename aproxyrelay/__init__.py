@@ -12,12 +12,11 @@ An async request library which requests data by utilizing various proxy servers.
 Automatically rotates bad proxy servers, preserves data which failed to request.
 Makes scraping API's easy and fun.
 """
-import asyncio
+from asyncio import get_event_loop, gather
 from datetime import datetime, UTC
+from logging import basicConfig, INFO, DEBUG, getLogger
+from typing import Callable
 from queue import Queue
-
-import logging
-import sys
 
 from .core import AProxyRelayCore
 
@@ -27,39 +26,56 @@ class AProxyRelay(AProxyRelayCore):
         self,
         targets: list[str],
         timeout: int = 5,
-        test_proxy: bool = True,
-        test_timeout: int = 20,
-        zone: str = 'us',
+        scrape: bool = True,
+        filter: bool = True,
+        zones: list[str] = ['US'],  # noqa: B006
+        unpack: Callable = lambda data, target: data,
         debug: bool = False,
-        steam: bool = False
     ) -> None:
         """
         Initialize an instance of AProxyRelay.
 
         Args:
-            targets (list[str]): Target URL's to obtain data from.
-            timeout (int): Amount of time in seconds before a connection is cancelled if not succeeded.
-            test_proxy (bool): When True, test proxy connections before utilizing them.
-            test_timeout (int): Timeout for testing proxy connections in seconds.
-            zone (str): Zone identifier, e.g., 'us', 'nl', 'de', 'uk', etc etc.
-            debug (bool): Enable debug mode if True.
-            steam (bool): Enable Steam mode if True.
+            targets: list[str]: Target URL's to obtain data from.
+            timeout: int: Amount of time in seconds before a connection is cancelled if not succeeded.
+            scrape: bool: When True, scrape for proxies (Slow). Otherwise fetch them from one source (Fast).
+            filter: bool: When True, test proxy connections before utilizing them.
+            zone: list[str]: List of whitelisted proxy zones. Only use proxies located in the provided array.
+            unpack: Callable: Filter extracted data through an anonymous method.
+            debug: bool: When True, ouput debug logs to terminal.
+
+        Example:
+            ```py
+                proxy_relay = AProxyRelay(
+                    targets=targets,
+                    timeout=5,
+                    scrape=True,
+                    filter=True,
+                    zones=['US', 'DE'],
+                    unpack=lambda data, target: data[target.split('appids=')[1]]['success'],
+                    debug=True,
+                )
+            ```
         """
         # Configure the logger
-        logging.basicConfig(level=logging.INFO if not debug else logging.DEBUG)
-        self.logger = logging.getLogger(__name__)
+        basicConfig(level=INFO if not debug else DEBUG)
+        self.logger = getLogger(__name__)
 
-        # TODO raise exceptions
-        self.timeout = timeout
-        self.test_timeout = test_timeout
-        self.test_proxy = test_proxy
-        self.zone = zone.upper()
-        self.debug = debug
-        self._steam = steam
-
+        # Initialize Core
         AProxyRelayCore.__init__(self)
+
+        # TODO raise exceptions for class arguments
+        self._queue_target_process = Queue(maxsize=len(targets))
         for item in list(set(targets)):
             self._queue_target_process.put(item)
+
+        self.timeout = timeout
+        self.scrape = scrape
+        self.filter = filter
+        self.zones = [z.upper() for z in zones]
+        self.unpack = unpack
+        self.debug = debug
+        self.started = None
 
     async def _main(self) -> Queue:
         """
@@ -82,25 +98,14 @@ class AProxyRelay(AProxyRelayCore):
         Returns:
             Queue: A queue containing the scraped data from the API.
         """
-        started = datetime.now(UTC)
-        self.logger.info(f'Started proxy relay at {started} ... Please wait ...!')
+        self.started = datetime.now(UTC)
+        self.logger.info(f'Started proxy relay at {self.started} ... Please wait ...!')
 
-        if sys.platform == "win32":
-            loop = asyncio.ProactorEventLoop()
-        else:
-            loop = asyncio.SelectorEventLoop()
+        loop = get_event_loop()
         loop.set_debug(self.debug)
+        results = loop.run_until_complete(gather(self._main()))
+        result = results.pop()
 
-        try:
-            # Create a task and set its name
-            task = loop.create_task(self._main())
-            task.set_name("AProxyRelay")
-
-            loop.run_until_complete(task)
-            self.logger.info(f'Data scraped! Took {datetime.now(UTC) - started}, enjoy!')
-
-            result = task.result()
-        finally:
-            loop.close()
+        self.logger.info(f'Data scraped! Took {datetime.now(UTC) - self.started}, enjoy!')
 
         return result

@@ -12,10 +12,9 @@ Process class, once all proxies have been received, we are going to obtain the d
 This class contains the core mechanics for scraping the targets.
 """
 from aiosocks2.connector import ProxyConnector, ProxyClientRequest
+from aiohttp import ClientSession
+from asyncio import gather
 from queue import Queue
-
-import asyncio
-import aiohttp
 
 
 class AProxyRelayProcessor(object):
@@ -23,7 +22,6 @@ class AProxyRelayProcessor(object):
         """
         Initialize an instance of AProxyRelayProcessor.
         """
-        self._queue_target_process = Queue()  # holds targets
         self._queue_result = Queue()  # Holds target results
 
     async def _process_targets_main(self) -> None:
@@ -32,19 +30,29 @@ class AProxyRelayProcessor(object):
         When they fail, we delete them from memory. Once the proxy queue is empty, we look for new proxies
         before we continue with our targets.
         """
-        tasks = []
-        while not self._queue_target_process.empty():
-            proxy = self.proxies.get()
-            if type(proxy) is dict:
-                proxy = f"{proxy['protocol']}://{proxy['ip']}:{proxy['port']}"
+        self.logger.info('Processing ...')
 
-            target = self._queue_target_process.get()
-            # For each parser, fetch the URL related to it
-            tasks.append(self._fetch_targets(target, proxy))
-            self.proxies.put(proxy)
+        async with ClientSession(
+            connector=ProxyConnector(remote_resolve=True),
+            request_class=ProxyClientRequest,
+            conn_timeout=self.timeout
+        ) as session:
+            tasks = []
 
-        # Wait for all requests to complete
-        await asyncio.gather(*tasks)
+            while not self._queue_target_process.empty():
+                proxy = self.proxies.get()
+                if isinstance(proxy, dict):
+                    proxy = f"{proxy['protocol'].replace('https', 'http')}://{proxy['ip']}:{proxy['port']}"
+                target = self._queue_target_process.get()
+
+                # Append the coroutine object to the tasks list
+                tasks.append(self._obtain_targets(proxy, target, session))
+                self.proxies.put(proxy)
+
+            self.proxies = Queue()
+            # Use asyncio.gather to concurrently execute all tasks
+            await gather(*tasks)
+
         self.logger.info(f'Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
 
         if self.proxies.empty() and self._queue_target_process.qsize() > 0:
@@ -52,31 +60,3 @@ class AProxyRelayProcessor(object):
             await self.process_targets()
         elif not self.proxies.empty() and self._queue_target_process.qsize() > 0:
             await self.process_targets()
-
-    async def _fetch_targets(self, target: str, proxy_url: str) -> None:
-        """
-        Asynchronously fetch the targets with our proxies.
-        The 'steam' variable should be defaulted to False and should only be used when targeting Steam.
-
-        Args:
-            target: The target URL to be fetched.
-            proxy_url: The URL of the proxy to be used for the request.
-        """
-        conn = ProxyConnector(remote_resolve=True)
-
-        async with aiohttp.ClientSession(connector=conn, request_class=ProxyClientRequest, conn_timeout=self.timeout) as session:
-            try:
-                async with session.get(target, proxy=proxy_url, headers=self._get_header()) as response:
-                    self.logger.debug(f"Requesting {target} with ({proxy_url}) -> Status Code: {response.status}")
-                    if response.status == 200:
-                        self.proxies.put(proxy_url)
-                        data = await response.json()
-                        if self._steam and data[target.split('appids=')[1]]['success']:
-                            self._queue_result.put(data[target.split('appids=')[1]]['data'])
-                        elif not self._steam:
-                            self._queue_result.put(data)
-                    else:
-                        self._queue_target_process.put(target)
-            except Exception as e:
-                self.logger.debug(f"Proxy request failed with error: {e}")
-                self._queue_target_process.put(target)

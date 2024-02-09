@@ -21,8 +21,9 @@ class ParserSpysNL(MainScraper):
         MainScraper.__init__(self)
 
     @classmethod
-    async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
+    async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
+        cls.zone = kwargs.get("zone", "nl")
         return url
 
     @classmethod
