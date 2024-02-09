@@ -18,7 +18,7 @@ from aiohttp.client_exceptions import ClientHttpProxyError, \
     ServerTimeoutError, \
     InvalidURL
 from aiosocks2.errors import SocksError
-from asyncio import gather
+from asyncio import gather, TimeoutError
 from json import dumps
 
 from .scrapers import proxy_list
@@ -195,5 +195,6 @@ class AProxyRelayRequests(object):
             ServerTimeoutError,
             InvalidURL,
             SocksError,
+            TimeoutError,
         ):
             self._queue_target_process.put(target)
