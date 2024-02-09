@@ -18,13 +18,12 @@ from .parser import MainScraper
 class ParserProxyScrapeHttp(MainScraper):
     def __init__(self) -> None:
         MainScraper.__init__(self)
-        self.zone = None
 
     @classmethod
-    async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
+    async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
-        cls.zone = zone
-        return url.replace('country=NL', f'country={zone.upper()}')
+        cls.zone = kwargs.get("zone", "us")
+        return url.replace('country=NL', f'country={cls.zone.upper()}')
 
     @classmethod
     async def format_raw(cls, html: str) -> list:
