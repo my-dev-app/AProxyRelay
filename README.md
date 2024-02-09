@@ -18,7 +18,7 @@ By undeƒined
 
 # AProxyRelay: An Async Request Library with Proxy Rotation
 
-AProxyRelay is an asynchronous request library designed for easy data retrieval using various proxy servers. It seamlessly handles proxy rotation, preserves data that fails to be requested, and simplifies API scraping. The library is written in `Python 3.12.1` but is compatible with projects utilizing `Python 3.11.2`.
+AProxyRelay is an asynchronous request library designed for easy data retrieval using various proxy servers. It seamlessly handles proxy rotation, preserves data that fails to be requested, and simplifies API scraping. The library is written in `Python 3.12.2`.
 
 In addition, tested proxies will be shared with other people using this library. The more this library is utilized, the bigger the pool of available proxies.
 
@@ -33,23 +33,27 @@ AProxyRelay streamlines the process of making asynchronous requests with proxy s
 
 ### Example
 ```py
+# -*- mode: python ; coding: utf-8 -*-
 from aproxyrelay import AProxyRelay
 
+# Note: Duplicates will be removed by the library
 targets = [
-    'https://some-website.com/api/app?id=1551360',
-    'https://some-website.com/api/app?id=2072450',
-    'https://some-website.com/api/app?id=1924360',
-    'https://some-website.com/api/app?id=1707870',
-    'https://some-website.com/api/app?id=1839880',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=US&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=DE&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=NL&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=CA&anonimity=all&protocol=all&page=1&size=100&type=example',
+    'https://gg.my-dev.app/api/v1/proxies/available?zone=AU&anonimity=all&protocol=all&page=1&size=100&type=example',
 ]
 
 # Initialize proxy relay
 proxy_relay = AProxyRelay(
     targets=targets,
     timeout=5,
-    test_proxy=True,
-    test_timeout=10,
-    zone='us',
+    scrape=True,
+    filter=True,
+    zones=['us'],
+    unpack=lambda data, target: data['results'],
+    debug=False,
 )
 
 # Fetch data
@@ -57,12 +61,31 @@ data = proxy_relay.start()
 
 # Result Queue
 print(data.qsize())
+
+while not data.empty():
+    content = data.get()
+    print(content)
+
 ```
 
 ## A Proxy Relay: Installation
 Simply run
 
     pip install aproxyrelay
+
+### Parameters
+
+| Parameters  | Type          | Function                                       | Description                                                  |
+|-------------|---------------|------------------------------------------------|--------------------------------------------------------------|
+| targets     | list[str]      | Target endpoints provided in an array           | Each endpoint will be requested with an available proxy. If a proxy is unavailable and the request fails, we store it in a queue and try it out with another proxy until we have data. |
+| timeout     | int           | Allowed proxy timeout. **Defaults to 5**        | A proxy has to respond within the provided timeout to be considered valid. Otherwise, it will be discarded.                |
+| scrape      | bool          | Indicator to utilize the proxy scraper. **Defaults to True** | The decision to scrape for proxies is determined by the value of this parameter. When set to True (default), the proxy scraper is used, which is slower but provides a broader range of proxies. When set to False, proxies are fetched from a single source, offering a faster but more limited selection. |
+| filter      | bool          | Indicator for filtering bad proxies. **Defaults to True** | If set to True (default), the tool will test proxy connections before using them. This process might take a bit longer, but it ensures that the proxies are valid before utilization. |
+| zones       | list[str]      | An array of proxy zones. **Defaults to ['US']**  | Sometimes it matters where the proxy is located. Each item in this list ensures the proxy is located in that specific zone, and requests made from the proxy are coming from the location provided. It acts like a whitelist for allowed proxy locations. |
+| unpack      | lambda        | Anonymous function for unpacking data. **Defaults to `lambda data, target: data`** | When a request has been made to a target through a proxy and data has been fetched, this lambda method formats the result data before putting it into the result queue. **data** -> output from the target, **target** -> target URL. |
+| debug       | bool          | Indicator which enables debug mode. **Defaults to False** | When true, additional logging will be printed to the terminal, enabling debug mode. |
+
+
 
 ## A Proxy Relay: Local Development
 To install all library dependencies for local development, excluding the core code available locally, use the following command within a virtual environment:
@@ -89,10 +112,12 @@ from .core import ScraperCore
 class MainScraper(ScraperCore):
     def __init__(self) -> None:
         ScraperCore.__init__(self)
+        self.zone = None
 
     @classmethod
     async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
+        cls.zone = kwargs.get("zone", "us")
         new_url = f'{url}'
         return new_url
 
