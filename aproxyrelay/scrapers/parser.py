@@ -18,11 +18,13 @@ from .core import ScraperCore
 class MainScraper(ScraperCore):
     def __init__(self) -> None:
         ScraperCore.__init__(self)
+        self.zone = None
 
     @classmethod
     async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
         new_url = f'{url}'
+        cls.zone = kwargs.get("zone", "us")
         return new_url
 
     @classmethod

@@ -20,9 +20,10 @@ class ParserLumiProxy(MainScraper):
         MainScraper.__init__(self)
 
     @classmethod
-    async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
+    async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
-        new_url = url.replace('country_code=nl', f'country_code={zone}')
+        cls.zone = kwargs.get("zone", "us")
+        new_url = url.replace('country_code=nl', f'country_code={cls.zone}')
         return new_url
 
     @classmethod

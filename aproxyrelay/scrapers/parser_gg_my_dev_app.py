@@ -20,9 +20,10 @@ class ParserGGMyDevApp(MainScraper):
         MainScraper.__init__(self)
 
     @classmethod
-    async def format_url(cls, url, zone: str = 'us', *args, **kwargs) -> str:
+    async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
-        return url.replace('zone=nl', f'zone={zone.upper()}')
+        cls.zone = kwargs.get("zone", "us")
+        return url.replace('zone=nl', f'zone={cls.zone.upper()}')
 
     @classmethod
     async def format_raw(cls, html: str) -> list:
