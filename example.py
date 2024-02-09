@@ -14,10 +14,11 @@ targets = [
 proxy_relay = AProxyRelay(
     targets=targets,
     timeout=5,
-    test_proxy=True,
-    test_timeout=10,
-    zone='US',
-    debug=False
+    scrape=True,
+    filter=True,
+    zones=['us'],
+    unpack=lambda data, target: data['results'],
+    debug=False,
 )
 
 # Fetch data
