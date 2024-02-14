@@ -37,7 +37,7 @@ class ParserSunnyProxyScraper(MainScraper):
         elif 'http' in target_method.lower():
             return 'https'
         return 'unknown'
-    
+
     @classmethod
     def generate_protocol(cls, target_protocol) -> str:
         if 'socks4' in target_protocol.lower():
@@ -49,7 +49,7 @@ class ParserSunnyProxyScraper(MainScraper):
         elif 'http' in target_protocol.lower():
             return 'http'
         return 'unknown'
-  
+
     @classmethod
     def generate_anonymity(cls, target_anonimity) -> str:
         if target_anonimity.lower() in (
