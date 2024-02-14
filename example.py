@@ -4,10 +4,6 @@ from aproxyrelay import AProxyRelay
 # Note: Duplicates will be removed by the library
 targets = [
     'https://gg.my-dev.app/api/v1/proxies/available?zone=US&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=DE&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=NL&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=CA&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=AU&anonimity=all&protocol=all&page=1&size=100&type=example',
 ]
 
 # Initialize proxy relay
@@ -20,6 +16,8 @@ proxy_relay = AProxyRelay(
     unpack=lambda data, target: data['results'],
     debug=False,
 )
+
+print(f'Proxies found: {proxy_relay.proxies.qsize()}')
 
 # Fetch data
 data = proxy_relay.start()
