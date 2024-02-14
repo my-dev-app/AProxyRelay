@@ -23,6 +23,12 @@ from .parser_spys_de import ParserSpysDE
 from .parser_spys_nl import ParserSpysNL
 from .parser_spys_us import ParserSpysUS
 from .parser_ssl_proxies import ParserSSLProxies
+from .parser_sunny9577_proxy_scraper import ParserSunnyProxyScraper
+from .parser_roosterkid_openproxylist_socks4 import ParserRoosterkidOpenproxylistSocks4
+from .parser_roosterkid_openproxylist_socks5 import ParserRoosterkidOpenproxylistSocks5
+from .parser_murongpig_proxy_master_http import ParserMurongpigProxyMasterHttp
+from .parser_murongpig_proxy_master_socks4 import ParserMurongpigProxyMasterSocks4
+from .parser_murongpig_proxy_master_socks5 import ParserMurongpigProxyMasterSocks5
 
 
 proxy_list = [
@@ -77,5 +83,29 @@ proxy_list = [
     {
         'url': 'https://gg.my-dev.app/api/v1/proxies/available?zone=nl&anonimity=all&protocol=all&page=1&size=1000',
         'parser': ParserGGMyDevApp,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/proxies.json',
+        'parser': ParserSunnyProxyScraper,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/roosterkid/openproxylist/main/SOCKS4_RAW.txt',
+        'parser': ParserRoosterkidOpenproxylistSocks4,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/roosterkid/openproxylist/main/SOCKS5_RAW.txt',
+        'parser': ParserRoosterkidOpenproxylistSocks5,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/http.txt',
+        'parser': ParserMurongpigProxyMasterHttp,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/socks4.txt',
+        'parser': ParserMurongpigProxyMasterSocks4,
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/socks5.txt',
+        'parser': ParserMurongpigProxyMasterSocks5,
     },
 ]
