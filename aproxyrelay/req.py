@@ -81,6 +81,8 @@ class AProxyRelayRequests(object):
             _target['proxy'] = f"{_target['protocol'].replace('https', 'http')}://{_target['ip']}:{_target['port']}"
             to_filter.append(_target)
 
+        # Remove duplicate entries
+        to_filter = [dict(x) for x in list(set([tuple(item.items()) for item in to_filter]))]
         tasks = [self._test_proxy_link(proxy['proxy'], proxy, session) for proxy in to_filter]
         await gather(*tasks)
 
