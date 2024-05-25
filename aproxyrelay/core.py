@@ -54,11 +54,11 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
         """
         Asynchronously fill the self.proxies queue with fresh proxies.
         """
-        self.logger.info('Initializing parsers ...')
+        self.logger.info('[aProxyRelay] Initializing parsers ...')
         ggs = []
         scrapes = []
         for item in proxy_list:
-            self.logger.info(f'Loading: {item["parser"].__name__}')
+            self.logger.info(f'[aProxyRelay] Loading: {item["parser"].__name__}')
             parser = item['parser']
             for zone in self.zones:
                 url = await parser.format_url(url=item['url'], zone=zone)
@@ -68,34 +68,32 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
                     scrapes.append(url)
         ggs = list(set(ggs))
         scrapes = list(set(scrapes))
-        self.logger.info(f'Parsers loaded: GG: {len(ggs)}, Other: {len(scrapes)}, Total: {len(ggs + scrapes)} ...')
+        self.logger.info(f'[aProxyRelay] Parsers loaded: GG: {len(ggs)}, Other: {len(scrapes)}, Total: {len(ggs + scrapes)} ...')
 
         if self.scrape:
             async with ClientSession(conn_timeout=self.timeout) as session:
                 await self._fetch_proxy_page(scrapes, session)
-            self.logger.info(f'Scraper: Found {self._queue_filter.qsize()} competent proxy servers')
+            self.logger.info(f'[aProxyRelay] Scraper: Found {self._queue_filter.qsize()} competent proxy servers')
         else:
-            self.logger.info('Scraper: Skip discovery of new proxy servers ...')
+            self.logger.info('[aProxyRelay] Scraper: Skip discovery of new proxy servers ...')
 
         if self.filter and self.scrape:
-            self.logger.info(
-                f'Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...'
-            )
+            self.logger.info(f'[aProxyRelay] Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...')  # noqa: B950
             async with ClientSession(conn_timeout=15) as session:
                 await self._test_all_proxies(session)
-            self.logger.info(f'Filter: Found {self._filtered_failed} incompetent and {self._filtered_available} available proxy servers in {datetime.now(UTC) - self.started}')  # noqa: B950
+            self.logger.info(f'[aProxyRelay] Filter: Found {self._filtered_failed} incompetent and {self._filtered_available} available proxy servers in {datetime.now(UTC) - self.started}')  # noqa: B950
         else:
             while not self._queue_filter.empty():
                 _target = self._queue_filter.get()
                 _target['proxy'] = f"{_target['protocol'].replace('https', 'http')}://{_target['ip']}:{_target['port']}"
                 self.proxies.put(_target)
-            self.logger.info('Filter: Skip tests for scraped proxy servers ...')
+            self.logger.info('[aProxyRelay] Filter: Skip tests for scraped proxy servers ...')
 
         async with ClientSession(conn_timeout=self.timeout) as session:
             await self._fetch_proxy_servers(ggs, session)
 
-        self.logger.info(f'Scraper: Found {self._filtered_ggs} additional available proxy servers')
-        self.logger.info(f'Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - self.started}, Please wait...')
+        self.logger.info(f'[aProxyRelay] Scraper: Found {self._filtered_ggs} additional available proxy servers')
+        self.logger.info(f'[aProxyRelay] Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - self.started}, Please wait...')  # noqa: B950
 
     async def process_targets(self) -> None:
         """

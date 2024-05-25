@@ -6,15 +6,15 @@
     "configurations": [
         {
             "name": "Start: Example",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/example.py",
+            "program": "${workspaceFolder}/ipython_config.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
         {
             "name": "Test: Pytest",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "justMyCode": true
