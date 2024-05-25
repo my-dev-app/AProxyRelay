@@ -88,7 +88,7 @@ class AProxyRelay(AProxyRelayCore):
         if self.proxies.qsize() > 0:
             await self.process_targets()
         else:
-            self.logger.error('Could not establish any available proxy! Please try again later.')
+            self.logger.error('[aProxyRelay] Could not establish any available proxy! Please try again later.')
         return self._queue_result
 
     def start(self) -> Queue:
@@ -99,13 +99,13 @@ class AProxyRelay(AProxyRelayCore):
             Queue: A queue containing the scraped data from the API.
         """
         self.started = datetime.now(UTC)
-        self.logger.info(f'Started proxy relay at {self.started} ... Please wait ...!')
+        self.logger.info(f'[aProxyRelay] Started proxy relay at {self.started} ... Please wait ...!')
 
         loop = get_event_loop()
         loop.set_debug(self.debug)
         results = loop.run_until_complete(gather(self._main()))
         result = results.pop()
 
-        self.logger.info(f'Data scraped! Took {datetime.now(UTC) - self.started}, enjoy!')
+        self.logger.info(f'[aProxyRelay] Data scraped! Took {datetime.now(UTC) - self.started}, enjoy!')
 
         return result

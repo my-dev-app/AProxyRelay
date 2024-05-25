@@ -29,7 +29,7 @@ class AProxyRelayRequests(object):
         """
         Initialize an instance of AProxyRelayRequests.
         """
-        self.logger.debug("AProxyRelay Request module initialized!")
+        self.logger.info("[aProxyRelay] Request module initialized!")
 
     async def _fetch_proxy_page(self, urls, session):
         """
@@ -57,7 +57,7 @@ class AProxyRelayRequests(object):
             return
 
         async with session.get(url, headers=self._get_header()) as response:
-            self.logger.info(f"Scraper: {url}, Status Code: {response.status}")
+            self.logger.info(f"[aProxyRelay] Scraper: {url}, Status Code: {response.status}")
             if response.status == 200:
                 new_queue = await parser.scrape(parser.zone, response)
                 while not new_queue.empty():
@@ -151,7 +151,7 @@ class AProxyRelayRequests(object):
         zone = url.split('zone=')[1].split('&')[0]
 
         async with session.get(url, headers=self._get_header()) as response:
-            self.logger.info(f"Scraper: {url}, Status Code: {response.status}")
+            self.logger.info(f"[aProxyRelay] Scraper: {url}, Status Code: {response.status}")
             if response.status == 200:
                 new_queue = await parser.scrape(zone, response)
                 while not new_queue.empty():
@@ -181,10 +181,13 @@ class AProxyRelayRequests(object):
                 if status == 200:
                     self.proxies.put(proxy_url)
                     data = await response.json()
-                    if pack := self.unpack(data, target):
-                        self._queue_result.put(pack)
+                    if data:
+                        if pack := self.unpack(data, target):
+                            self._queue_result.put(pack)
+                        else:
+                            self.logger.warning(f'[aProxyRelay] Could not unpack data for: {target}')
                     else:
-                        self.logger.warning(f'Could not unpack data for: {target}')
+                        self.logger.warning(f'[aProxyRelay] Target {target} Data seems to be None: {data}')
                 else:
                     self._queue_target_process.put(target)
 

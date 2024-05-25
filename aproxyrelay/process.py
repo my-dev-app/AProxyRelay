@@ -30,7 +30,7 @@ class AProxyRelayProcessor(object):
         When they fail, we delete them from memory. Once the proxy queue is empty, we look for new proxies
         before we continue with our targets.
         """
-        self.logger.info('Processing ...')
+        self.logger.info('[aProxyRelay] Processing ...')
 
         async with ClientSession(
             connector=ProxyConnector(remote_resolve=True),
@@ -53,7 +53,7 @@ class AProxyRelayProcessor(object):
             # Use asyncio.gather to concurrently execute all tasks
             await gather(*tasks)
 
-        self.logger.info(f'Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
+        self.logger.info(f'[aProxyRelay] Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
 
         if self.proxies.empty() and self._queue_target_process.qsize() > 0:
             await self.get_proxies()
