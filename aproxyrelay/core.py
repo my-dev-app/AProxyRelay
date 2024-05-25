@@ -78,9 +78,7 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
             self.logger.info('[aProxyRelay] Scraper: Skip discovery of new proxy servers ...')
 
         if self.filter and self.scrape:
-            self.logger.info(
-                f'[aProxyRelay] Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...'
-            )
+            self.logger.info(f'[aProxyRelay] Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...')  # noqa: B950
             async with ClientSession(conn_timeout=15) as session:
                 await self._test_all_proxies(session)
             self.logger.info(f'[aProxyRelay] Filter: Found {self._filtered_failed} incompetent and {self._filtered_available} available proxy servers in {datetime.now(UTC) - self.started}')  # noqa: B950
@@ -95,7 +93,7 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
             await self._fetch_proxy_servers(ggs, session)
 
         self.logger.info(f'[aProxyRelay] Scraper: Found {self._filtered_ggs} additional available proxy servers')
-        self.logger.info(f'[aProxyRelay] Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - self.started}, Please wait...')
+        self.logger.info(f'[aProxyRelay] Found {self.proxies.qsize()} working proxies, took {datetime.now(UTC) - self.started}, Please wait...')  # noqa: B950
 
     async def process_targets(self) -> None:
         """
