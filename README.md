@@ -1,3 +1,6 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
+---
+
 ```python
     #       ######                                ######                             
    # #      #     # #####   ####  #    # #   #    #     # ###### #        ##   #   # 
@@ -15,6 +18,9 @@ By undeƒined
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/aproxyrelay)
 ![GitHub commits since latest release](https://img.shields.io/github/commits-since/my-dev-app/proxy-relay/latest)
 ![GitHub Repo stars](https://img.shields.io/github/stars/my-dev-app/proxy-relay?style=social)
+
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
+[![Russian Warship Go Fuck Yourself](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/RussianWarship.svg)](https://stand-with-ukraine.pp.ua)
 
 # AProxyRelay: An Async Request Library with Proxy Rotation
 
