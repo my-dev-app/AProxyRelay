@@ -24,8 +24,7 @@ class ParserGeonodeProxy(MainScraper):
     async def format_url(cls, url, *args, **kwargs) -> str:
         """Formats URL before scraping, let us adjust query parameters for each parser"""
         cls.zone = kwargs.get("country", "US")
-        cls.zone.upper()
-        return url
+        return url.replace('country=US', f'country={cls.zone.upper()}')
 
     @classmethod
     async def format_raw(cls, html: str) -> list:
