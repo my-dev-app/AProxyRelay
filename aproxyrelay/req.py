@@ -99,8 +99,7 @@ class AProxyRelayRequests(object):
         """
         try:
             async with session.post(
-                # 'https://gg.my-dev.app/api/v1/proxies/validate/lib',
-                'https://test.my-dev.app/api/v1/proxies/validate/lib',
+                'https://gg.my-dev.app/api/v1/proxies/validate/lib',
                 proxy=proxy_url,
                 headers={
                     **self._get_header(),
