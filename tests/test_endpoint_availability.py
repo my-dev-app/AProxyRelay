@@ -29,7 +29,7 @@ async def test_parse_proxy_data():
         parser = endpoint.get("parser")
         if not parser:
             pytest.fail(f"Parser for endpoint is required key: {endpoint}")
-        
+
         url = await parser.format_url(url)
 
         # Check if the website is reachable without mocking (real test)
