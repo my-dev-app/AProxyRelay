@@ -22,6 +22,7 @@ setup(
             'build',
             'flake8-bugbear',
             'pytest',
+            'pytest-asyncio',
             'pytest-cov',
             'pytest-sugar',
             'pytest-xdist',

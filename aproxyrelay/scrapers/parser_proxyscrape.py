@@ -36,7 +36,7 @@ class ParserProxyScrape(MainScraper):
         for item in data['proxies']:
             if item['ip_data']['countryCode'] == zone.upper():
                 queue.put({
-                    'zone': item['ip_data']['countryCode'],
+                    'zone': item['ip_data']['countryCode'].upper(),
                     'method': item['protocol'],
                     'anonymity': 'anonymous' if item['anonymity'] in ['elite', 'elite proxy', 'anonymous'] else 'transparent',
                     'protocol': item['protocol'],

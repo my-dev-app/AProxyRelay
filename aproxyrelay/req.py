@@ -120,6 +120,7 @@ class AProxyRelayRequests(object):
             ClientOSError,
             ServerTimeoutError,
             InvalidURL,
+            ConnectionResetError,
         ):
             self._filtered_failed = self._filtered_failed + 1
 
@@ -178,7 +179,7 @@ class AProxyRelayRequests(object):
                 },
             ) as response:
                 status = response.status
-                if status == 200:
+                if status in (200, 202,):
                     self.proxies.put(proxy_url)
                     data = await response.json()
                     if data:

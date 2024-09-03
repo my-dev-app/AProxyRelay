@@ -29,6 +29,11 @@ from .parser_roosterkid_openproxylist_socks5 import ParserRoosterkidOpenproxylis
 from .parser_murongpig_proxy_master_http import ParserMurongpigProxyMasterHttp
 from .parser_murongpig_proxy_master_socks4 import ParserMurongpigProxyMasterSocks4
 from .parser_murongpig_proxy_master_socks5 import ParserMurongpigProxyMasterSocks5
+from .parser_geonode import ParserGeonodeProxy
+from .parser_proxyscraper_com import ParserScraperComProxy
+from .parser_the_speed_http import ParserTheSpeedHTTPProxy
+from .parser_the_speed_sock4 import ParserTheSpeedSock4Proxy
+from .parser_the_speed_sock5 import ParserTheSpeedSock5Proxy
 
 
 proxy_list = [
@@ -107,5 +112,25 @@ proxy_list = [
     {
         'url': 'https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/socks5.txt',
         'parser': ParserMurongpigProxyMasterSocks5,
+    },
+    {
+        'url': 'https://proxylist.geonode.com/api/proxy-list?country=US&limit=500&page=1&sort_by=lastChecked&sort_type=desc',
+        'parser': ParserGeonodeProxy
+    },
+    {
+        'url': 'https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&country=us&proxy_format=protocolipport&format=text&timeout=20000',  # noqa: B950
+        'parser': ParserScraperComProxy
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt',
+        'parser': ParserTheSpeedHTTPProxy
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks4.txt',
+        'parser': ParserTheSpeedSock4Proxy
+    },
+    {
+        'url': 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt',
+        'parser': ParserTheSpeedSock5Proxy
     },
 ]
