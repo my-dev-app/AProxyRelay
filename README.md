@@ -45,10 +45,6 @@ from aproxyrelay import AProxyRelay
 # Note: Duplicates will be removed by the library
 targets = [
     'https://gg.my-dev.app/api/v1/proxies/available?zone=US&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=DE&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=NL&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=CA&anonimity=all&protocol=all&page=1&size=100&type=example',
-    'https://gg.my-dev.app/api/v1/proxies/available?zone=AU&anonimity=all&protocol=all&page=1&size=100&type=example',
 ]
 
 # Initialize proxy relay
@@ -62,6 +58,8 @@ proxy_relay = AProxyRelay(
     debug=False,
 )
 
+print(f'Proxies found: {proxy_relay.proxies.qsize()}')
+
 # Fetch data
 data = proxy_relay.start()
 
@@ -71,7 +69,6 @@ print(data.qsize())
 while not data.empty():
     content = data.get()
     print(content)
-
 ```
 
 ## A Proxy Relay: Installation
@@ -149,6 +146,7 @@ To contribute your own proxy scraper, follow these steps:
     - `format_url`: Manipulate the proxy list request URL before making a request, enabling adjustment of various query parameters.
     - `format_raw`: When the data obtained from the link is `txt/html`, this method should scrape the data and format it into workable data.
     - `format_data`: This method is triggered when the call to the proxy list returns a dictionary, or when format_raw has been completed.
+    - For a full overview of the available methods to overwritte see: [Scrapers](./github/docs/Scrapers.md)
 3. ### Formatting Data:
     - Your goal is to format the data in the `format_data` method and place it into the provided Queue. The data should be structured as follows:
         ```python
