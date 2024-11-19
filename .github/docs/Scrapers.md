@@ -98,7 +98,13 @@ Run the unittests included in this library
 pytest
 ```
 
-If all tests succeed proceed with making a PR
+If all tests succeed, proceed with testing for flake8 violations
 
-## Submit a PR
+```py
+flake8
+```
+
+When 0 violations have been made, proceed with submitting a Pull Request
+
+## Submit a Pull Request
 Once your PR has been merged, your parser will be included in the internal system which provided proxies.
