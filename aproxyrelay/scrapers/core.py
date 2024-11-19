@@ -25,14 +25,17 @@ class ScraperCore(object):
 
     @classmethod
     async def scrape(cls, zone, response):
-        if response.content_type == 'application/json':
+        if hasattr(response, 'content_type') and response.content_type == 'application/json':
             data = await response.json()
-        elif response.content_type == 'text/html':
+        elif hasattr(response, 'content_type') and response.content_type == 'text/html':
             data = await response.text()
             data = await cls.format_raw(data)
-        elif response.content_type == 'text/plain':
+        elif hasattr(response, 'content_type') and response.content_type == 'text/plain':
             data = await response.content.read()
             data = await cls.format_raw(data.decode())
+        elif not hasattr(response, 'content_type') and hasattr(response, 'json'):  # Handle custom responses
+            data = response.json()
+            data = await cls.format_raw(data)
         else:
             raise ReferenceError(f'None exiting content type for parser: {response.content_type}')
         queue = await cls._flatten_response(data)
