@@ -56,9 +56,10 @@ class AProxyRelayRequests(object):
         else:
             return
 
-        async with session.get(url, headers=self._get_header()) as response:
-            self.logger.info(f"[aProxyRelay] Scraper: {url}, Status Code: {response.status}")
-            if response.status == 200:
+        if hasattr(parser, 'custom_request'):
+            response = await parser.custom_request(url=url)
+            self.logger.info(f"[aProxyRelay] Scraper: {url}, Status Code: {response.status_code}")
+            if response.status_code == 200:
                 new_queue = await parser.scrape(parser.zone, response)
                 while not new_queue.empty():
                     row = new_queue.get()
@@ -66,6 +67,17 @@ class AProxyRelayRequests(object):
                         self._queue_filter.put(row)
                     else:
                         self.proxies.put(row)
+        else:
+            async with session.get(url, headers=self._get_header()) as response:
+                self.logger.info(f"[aProxyRelay] Scraper: {url}, Status Code: {response.status}")
+                if response.status == 200:
+                    new_queue = await parser.scrape(parser.zone, response)
+                    while not new_queue.empty():
+                        row = new_queue.get()
+                        if self.filter:
+                            self._queue_filter.put(row)
+                        else:
+                            self.proxies.put(row)
 
     async def _test_all_proxies(self, session):
         """
