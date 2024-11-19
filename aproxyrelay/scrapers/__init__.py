@@ -10,6 +10,7 @@ By undeƒined
 
 Proxy list and their mapped scrapers
 """
+from .parser_engagemintcreative import ParserEngagemintcreative
 from .parser_freeproxylist import ParserFreeProxyList
 from .parser_gg_my_dev_app import ParserGGMyDevApp
 from .parser_lumiproxy import ParserLumiProxy
@@ -132,5 +133,9 @@ proxy_list = [
     {
         'url': 'https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt',
         'parser': ParserTheSpeedSock5Proxy
+    },
+    {
+        'url': 'https://broker.engagemintcreative.com/proxies',
+        'parser': ParserEngagemintcreative
     },
 ]

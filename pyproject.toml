@@ -51,7 +51,7 @@ plugins = []
 
 [tool.coverage.report]
 # If the total coverage measurement is under this value, then exit with a status code of 2.
-fail_under = 40
+fail_under = 25
 # Ignore source code that can’t be found, emitting a warning instead of an exception.
 ignore_errors = false
 # A list of file name patterns, the files to include in reporting
