@@ -11,8 +11,6 @@ By undeƒined
 Process class, once all proxies have been received, we are going to obtain the data for the targets.
 This class contains the core mechanics for scraping the targets.
 """
-from aiosocks2.connector import ProxyConnector, ProxyClientRequest
-from aiohttp import ClientSession
 from asyncio import gather
 from queue import Queue
 
@@ -32,31 +30,29 @@ class AProxyRelayProcessor(object):
         """
         self.logger.info('[aProxyRelay] Processing ...')
 
-        async with ClientSession(
-            connector=ProxyConnector(remote_resolve=True),
-            request_class=ProxyClientRequest,
-            conn_timeout=self.timeout
-        ) as session:
-            tasks = []
+        tasks = []
 
-            while not self._queue_target_process.empty():
-                proxy = self.proxies.get()
-                if isinstance(proxy, dict):
-                    proxy = f"{proxy['protocol'].replace('https', 'http')}://{proxy['ip']}:{proxy['port']}"
-                target = self._queue_target_process.get()
+        while not self._queue_target_process.empty():
+            proxy = self.proxies.get()
+            if isinstance(proxy, dict):
+                proxy = f"{proxy['protocol'].replace('https', 'http')}://{proxy['ip']}:{proxy['port']}"
+            target = self._queue_target_process.get()
 
-                # Append the coroutine object to the tasks list
-                tasks.append(self._obtain_targets(proxy, target, session))
-                self.proxies.put(proxy)
+            # Append the coroutine object to the tasks list
+            tasks.append(self._obtain_targets(proxy, target))
 
-            self.proxies = Queue()
-            # Use asyncio.gather to concurrently execute all tasks
-            await gather(*tasks)
+        # Use asyncio.gather to concurrently execute all tasks
+        await gather(*tasks)
 
-        self.logger.info(f'[aProxyRelay] Processing ({self._queue_target_process.qsize()}) items in Queue ... Please wait...')
+        self.logger.info(f'[aProxyRelay] Processing ({self._queue_target_process.qsize()}) items in Queue using ({self.proxies.qsize()}) proxies ... Please wait...')  # noqa: B950
 
+        # Proxy queue is empty but targets are available
         if self.proxies.empty() and self._queue_target_process.qsize() > 0:
+            self.logger.info(
+                f'[aProxyRelay] All Proxies exhausted ({self._queue_target_process.qsize()}) items left in Queue ... Please wait...'
+            )
             await self.get_proxies()
             await self.process_targets()
+        # Proxy queue has proxies targets are available
         elif not self.proxies.empty() and self._queue_target_process.qsize() > 0:
             await self.process_targets()
