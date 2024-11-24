@@ -14,9 +14,10 @@ Makes scraping API's easy and fun.
 """
 from asyncio import get_event_loop, gather
 from datetime import datetime, UTC
-from logging import basicConfig, INFO, DEBUG, getLogger
 from typing import Callable
 from queue import Queue
+
+import logging
 
 from .core import AProxyRelayCore
 
@@ -25,7 +26,7 @@ class AProxyRelay(AProxyRelayCore):
     def __init__(
         self,
         targets: list[str],
-        timeout: int = 5,
+        timeout: int = 30,
         scrape: bool = True,
         filter: bool = True,
         zones: list[str] = ['US'],  # noqa: B006
@@ -48,7 +49,7 @@ class AProxyRelay(AProxyRelayCore):
             ```py
                 proxy_relay = AProxyRelay(
                     targets=targets,
-                    timeout=5,
+                    timeout=30,
                     scrape=True,
                     filter=True,
                     zones=['US', 'DE'],
@@ -58,8 +59,13 @@ class AProxyRelay(AProxyRelayCore):
             ```
         """
         # Configure the logger
-        basicConfig(level=INFO if not debug else DEBUG)
-        self.logger = getLogger(__name__)
+        logging.basicConfig(level=logging.INFO if not debug else logging.DEBUG)
+        self.logger = logging.getLogger(__name__)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG if debug else logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
 
         # Initialize Core
         AProxyRelayCore.__init__(self)
