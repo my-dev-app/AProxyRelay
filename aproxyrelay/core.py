@@ -79,8 +79,7 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
 
         if self.filter and self.scrape:
             self.logger.info(f'[aProxyRelay] Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...')  # noqa: B950
-            async with ClientSession(conn_timeout=15) as session:
-                await self._test_all_proxies(session)
+            await self._test_all_proxies()
             self.logger.info(f'[aProxyRelay] Filter: Found {self._filtered_failed} incompetent and {self._filtered_available} available proxy servers in {datetime.now(UTC) - self.started}')  # noqa: B950
         else:
             while not self._queue_filter.empty():
