@@ -50,7 +50,7 @@ targets = [
 # Initialize proxy relay
 proxy_relay = AProxyRelay(
     targets=targets,
-    timeout=5,
+    timeout=30,
     scrape=True,
     filter=True,
     zones=['us'],
