@@ -10,15 +10,15 @@ By undeƒined
 
 Class which handles all requests made throughout the library.
 """
-from aiohttp.client_exceptions import ClientHttpProxyError, \
-    ServerDisconnectedError, \
-    ClientProxyConnectionError, \
+from ssl import SSLCertVerificationError, SSLError
+from aiohttp import ClientSession, ClientTimeout
+from aiohttp.client_exceptions import ServerDisconnectedError, \
     ClientResponseError, \
     ClientOSError, \
-    ServerTimeoutError, \
-    InvalidURL
-from aiosocks2.errors import SocksError
-from asyncio import gather, TimeoutError
+    InvalidURL, \
+    ConnectionTimeoutError
+from aiohttp_socks import ProxyConnectionError, ProxyConnector, ProxyError
+from asyncio import IncompleteReadError, gather, TimeoutError
 from json import dumps
 
 from .scrapers import proxy_list
@@ -79,12 +79,9 @@ class AProxyRelayRequests(object):
                         else:
                             self.proxies.put(row)
 
-    async def _test_all_proxies(self, session):
+    async def _test_all_proxies(self):
         """
         Use asyncio.gather to run multiple requests concurrently by executing `self._test_proxy_link`.
-
-        Args:
-            session: aiohttp session without proxy support
         """
         # Use asyncio.gather to run multiple tests concurrently
         to_filter = []
@@ -95,10 +92,10 @@ class AProxyRelayRequests(object):
 
         # Remove duplicate entries
         to_filter = [dict(x) for x in list(set([tuple(item.items()) for item in to_filter]))]
-        tasks = [self._test_proxy_link(proxy['proxy'], proxy, session) for proxy in to_filter]
+        tasks = [self._test_proxy_link(proxy['proxy'], proxy) for proxy in to_filter]
         await gather(*tasks)
 
-    async def _test_proxy_link(self, proxy_url, data, session) -> None:
+    async def _test_proxy_link(self, proxy_url, data) -> None:
         """
         Asynchronously call gg.my-dev.app, a website built by the creator of this package.
         If the connection was successful, the proxy works!
@@ -109,31 +106,48 @@ class AProxyRelayRequests(object):
             proxy_url: The URL of the proxy to be tested.
             data: Additional data for the proxy test.
         """
+        # If port is empty, assume port 80
+        if data['port'] == '':
+            data['port'] = '80'
+        # Make sure port is range
+        if int(data['port']) < 0 or int(data['port']) > 65535: return
         try:
-            async with session.post(
-                'https://gg.my-dev.app/api/v1/proxies/validate/lib',
-                proxy=proxy_url,
-                headers={
-                    **self._get_header(),
-                    'Content-Type': 'application/json'
-                },
-                data=dumps(data)
-            ) as response:
-                if response.status == 200:
-                    self.proxies.put(data)
-                    self._filtered_available = self._filtered_available + 1
-                else:
-                    self._filtered_failed = self._filtered_failed + 1
+            self.logger.debug(f'[aProxyRelay] Processing: {proxy_url} -> Added to queue')
+            connector = ProxyConnector.from_url(proxy_url.replace('unknown', 'socks4'))
+            timeout = ClientTimeout(total=self.timeout, connect=self.timeout)
+            async with ClientSession(connector=connector, timeout=timeout) as session:
+                async with session.post(
+                    'https://gg.my-dev.app/api/v1/proxies/validate/lib',
+                    headers={
+                        **self._get_header(),
+                        'Content-Type': 'application/json'
+                    },
+                    data=dumps(data)
+                ) as response:
+                    if response.status == 200:
+                        self.proxies.put(data)
+                        self._filtered_available = self._filtered_available + 1
+                        self.logger.debug(f'[aProxyRelay] Succeed: {proxy_url} -> Freshly Discovered')
+                    else:
+                        self._filtered_failed = self._filtered_failed + 1
+                        self.logger.debug(f'[aProxyRelay] Succeed: {proxy_url} -> Addres Known')
         except (
-            ClientHttpProxyError,
-            ServerDisconnectedError,
-            ClientProxyConnectionError,
-            ClientResponseError,
             ClientOSError,
-            ServerTimeoutError,
             InvalidURL,
             ConnectionResetError,
-        ):
+            ProxyError,
+            SSLCertVerificationError,
+            ProxyConnectionError,
+            ConnectionTimeoutError,
+            IncompleteReadError,
+            UnicodeEncodeError,
+            SSLError,
+            ConnectionAbortedError,
+            ServerDisconnectedError,
+            ClientResponseError,
+            TimeoutError
+        ) as e:
+            self.logger.debug(f'[aProxyRelay] Failed: {proxy_url} -> {repr(e)}')
             self._filtered_failed = self._filtered_failed + 1
 
     async def _fetch_proxy_servers(self, urls, session):
@@ -172,7 +186,7 @@ class AProxyRelayRequests(object):
                     self.proxies.put(row)
                     self._filtered_ggs = self._filtered_ggs + 1
 
-    async def _obtain_targets(self, proxy_url, target, session) -> None:
+    async def _obtain_targets(self, proxy_url, target) -> None:
         """
         Asynchronously fetch the targets with our proxies.
         The 'steam' variable should be defaulted to False and should only be used when targeting Steam.
@@ -182,37 +196,44 @@ class AProxyRelayRequests(object):
             proxy_url: The URL of the proxy to be used for the request.
         """
         try:
-            async with session.get(
-                target,
-                proxy=proxy_url,
-                headers={
-                    **self._get_header(),
-                    'Content-Type': 'application/json'
-                },
-            ) as response:
-                status = response.status
-                if status in (200, 202,):
-                    self.proxies.put(proxy_url)
-                    data = await response.json()
-                    if data:
-                        if pack := self.unpack(data, target):
-                            self._queue_result.put(pack)
+            connector = ProxyConnector.from_url(proxy_url.replace('unknown', 'socks4'))
+            timeout = ClientTimeout(total=self.timeout, connect=self.timeout)
+            async with ClientSession(connector=connector, timeout=timeout) as session:
+                async with session.get(
+                    target,
+                    headers={
+                        **self._get_header(),
+                        'Content-Type': 'application/json'
+                    },
+                ) as response:
+                    status = response.status
+                    if status in (200, 202,):
+                        self.proxies.put(proxy_url)
+                        data = await response.json()
+                        if data:
+                            if pack := self.unpack(data, target):
+                                self._queue_result.put(pack)
+                            else:
+                                self.logger.warning(f'[aProxyRelay] Could not unpack data for: {target}')
                         else:
-                            self.logger.warning(f'[aProxyRelay] Could not unpack data for: {target}')
+                            self.logger.warning(f'[aProxyRelay] Target {target} Data seems to be None: {data}')
                     else:
-                        self.logger.warning(f'[aProxyRelay] Target {target} Data seems to be None: {data}')
-                else:
-                    self._queue_target_process.put(target)
-
+                        self._queue_target_process.put(target)
         except (
-            ClientHttpProxyError,
-            ServerDisconnectedError,
-            ClientProxyConnectionError,
-            ClientResponseError,
             ClientOSError,
-            ServerTimeoutError,
             InvalidURL,
-            SocksError,
-            TimeoutError,
-        ):
+            ConnectionResetError,
+            ProxyError,
+            SSLCertVerificationError,
+            ProxyConnectionError,
+            ConnectionTimeoutError,
+            IncompleteReadError,
+            UnicodeEncodeError,
+            SSLError,
+            ConnectionAbortedError,
+            ServerDisconnectedError,
+            ClientResponseError,
+            TimeoutError
+        ) as e:
+            self.logger.debug(f'[aProxyRelay] Failed: {target} -> {repr(e)}')
             self._queue_target_process.put(target)

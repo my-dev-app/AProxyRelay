@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'aiohttp',
-        'aiosocks2',
+        'aiohttp_socks',
         'beautifulsoup4',
     ],
     extras_require={
