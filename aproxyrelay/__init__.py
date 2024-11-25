@@ -61,11 +61,6 @@ class AProxyRelay(AProxyRelayCore):
         # Configure the logger
         logging.basicConfig(level=logging.INFO if not debug else logging.DEBUG)
         self.logger = logging.getLogger(__name__)
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG if debug else logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        console_handler.setFormatter(formatter)
-        self.logger.addHandler(console_handler)
 
         # Initialize Core
         AProxyRelayCore.__init__(self)
