@@ -22,6 +22,10 @@ class AProxyRelayProcessor(object):
         """
         self._queue_result = Queue()  # Holds target results
 
+    def _chunk_list(self, lst, chunk_size):
+        """Chunks a list in its desired size"""
+        return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
     async def _process_targets_main(self) -> None:
         """
         Start the Proxy Relay Processor. Proxies in the queue are nothing less than burners.
@@ -41,8 +45,16 @@ class AProxyRelayProcessor(object):
             # Append the coroutine object to the tasks list
             tasks.append(self._obtain_targets(proxy, target))
 
-        # Use asyncio.gather to concurrently execute all tasks
-        await gather(*tasks)
+        # We have to chunk our tasks, otherwise the internet bandwitdh might be compromised
+        chunks = self._chunk_list(tasks, 10000)
+        i = 0
+        for chunk in chunks:
+            self.logger.info(f"[aProxyRelay] Processing ({i}/{len(tasks)}) ... please wait ...")
+            i += int(len(chunk))
+            # Use asyncio.gather to concurrently execute all tasks
+            await gather(*chunk)
+        # # Use asyncio.gather to concurrently execute all tasks
+        # await gather(*tasks)
 
         self.logger.info(f'[aProxyRelay] Processing ({self._queue_target_process.qsize()}) items in Queue using ({self.proxies.qsize()}) proxies ... Please wait...')  # noqa: B950
 
