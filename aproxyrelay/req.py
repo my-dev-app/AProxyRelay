@@ -31,6 +31,10 @@ class AProxyRelayRequests(object):
         """
         self.logger.info("[aProxyRelay] Request module initialized!")
 
+    def _chunk_list(self, lst, chunk_size):
+        """Chunks a list in its desired size"""
+        return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
     async def _fetch_proxy_page(self, urls, session):
         """
         Use asyncio.gather to run multiple requests concurrently by executing `self._request_proxy_page`.
@@ -84,16 +88,25 @@ class AProxyRelayRequests(object):
         Use asyncio.gather to run multiple requests concurrently by executing `self._test_proxy_link`.
         """
         # Use asyncio.gather to run multiple tests concurrently
-        to_filter = []
+        raw = []
         while not self._queue_filter.empty():
             _target = self._queue_filter.get()
             _target['proxy'] = f"{_target['protocol'].replace('https', 'http')}://{_target['ip']}:{_target['port']}"
-            to_filter.append(_target)
+            raw.append(_target)
 
         # Remove duplicate entries
-        to_filter = [dict(x) for x in list(set([tuple(item.items()) for item in to_filter]))]
+        to_filter = [dict(x) for x in list(set([tuple(item.items()) for item in raw]))]
+        self.logger.info(f"[aProxyRelay] Found ({int(len(raw)) - int(len(to_filter))}) duplicates which have been removed")
         tasks = [self._test_proxy_link(proxy['proxy'], proxy) for proxy in to_filter]
-        await gather(*tasks)
+        # We have to chunk our tasks, otherwise the internet bandwitdh might be compromised
+        chunks = self._chunk_list(tasks, 10000)
+        i = 0
+        for chunk in chunks:
+            self.logger.info(f"[aProxyRelay] Brewing ({i}/{len(tasks)}) ... please wait ...")
+            i += int(len(chunk))
+            # Use asyncio.gather to concurrently execute all tasks
+            await gather(*chunk)
+        # await gather(*tasks)
 
     async def _test_proxy_link(self, proxy_url, data) -> None:
         """
