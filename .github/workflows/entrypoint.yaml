@@ -5,7 +5,7 @@ on:
   # Trigger build(s) on specified branch, git action:
   pull_request:
     types: [opened, closed, synchronize]
-    branches: 
+    branches:
       - 'development'
       - 'master'
 
@@ -24,78 +24,77 @@ jobs:
     uses: ./.github/workflows/test_python_flake.yaml
     secrets: inherit
 
-  unittest:
-    needs:
-      - flake
-    uses: ./.github/workflows/test_python_tests.yaml
-    secrets: inherit
-
   approve_development:
     needs:
       - flake
-      - unittest
     uses: ./.github/workflows/auto_approve.yaml
     secrets: inherit
 
-  deployment_question:
+  unittest:
     if: |
       github.event_name == 'pull_request' && 
       github.event.pull_request.merged == true && 
       github.ref == 'refs/heads/development' &&
       github.event.action == 'closed'
+    uses: ./.github/workflows/test_python_tests.yaml
+    secrets: inherit
+
+  deployment_question:
+    needs:
+      - unittest
     runs-on: self-hosted
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - id: string
-      uses: ASzc/change-string-case-action@v5
-      with:
-        string: ${{github.event.repository.name}}
-    - name: Create Pull Request
-      id: cpr
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const { repo, owner } = context.repo;
-          const result = await github.rest.pulls.create({
-            title: 'Deploy A Proxy Relay Package? - ${{ github.run_number }}',
-            owner,
-            repo,
-            head: '${{ github.ref_name }}',
-            base: 'master',
-            body: [
-              'Would you like to release a new build of aproxyrelay ?\n',
-              'Update A Proxy Relay to latest',
-              '---',
-              'Build and release new version!',
-            ].join('\n'),
-            assignees: '@0x78f1935',
-            reviewers: '@0x78f1935',
-          });
-          github.rest.issues.addLabels({
-            owner,
-            repo,
-            issue_number: result.data.number,
-            labels: ['docker', 'automated', 'prod-deployment'],
-          });
-          const os = require("os");
-          const fs = require("fs");
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - id: string
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{github.event.repository.name}}
+      - name: Create Pull Request
+        id: cpr
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.pulls.create({
+              title: 'Deploy A Proxy Relay Package? - ${{ github.run_number }}',
+              owner,
+              repo,
+              head: '${{ github.ref_name }}',
+              base: 'master',
+              body: [
+                'Would you like to release a new build of aproxyrelay ?\n',
+                'Update A Proxy Relay to latest',
+                '---',
+                'Build and release new version!',
+              ].join('\n'),
+              assignees: '@0x78f1935',
+              reviewers: '@0x78f1935',
+            });
+            github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: result.data.number,
+              labels: ['docker', 'automated', 'prod-deployment'],
+            });
+            const os = require("os");
+            const fs = require("fs");
 
-          function setOutput(key, value) {
-            // Temporary hack until core actions library catches up with github new recommendations
-            const output = process.env['GITHUB_OUTPUT']
-            fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
-          };
-          setOutput('pr_id', result.data.number);
+            function setOutput(key, value) {
+              // Temporary hack until core actions library catches up with github new recommendations
+              const output = process.env['GITHUB_OUTPUT']
+              fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
+            };
+            setOutput('pr_id', result.data.number);
 
   deploy_package:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'prod-deployment')
     timeout-minutes: 30
     runs-on: self-hosted
     environment: production
-    permissions: 
+    permissions:
       id-token: write
       contents: write
       pull-requests: write
@@ -126,8 +125,8 @@ jobs:
         id: release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl"
-          bodyFile: "README.md"
+          artifacts: 'dist/aproxyrelay-*.tar.gz,dist/aproxyrelay-*.whl'
+          bodyFile: 'README.md'
           generateReleaseNotes: true
           makeLatest: true
           token: ${{ secrets.PERSONAL_GITHUB_ACTIONS_TOKEN }}
