@@ -81,7 +81,8 @@ class AProxyRelayCore(AProxyRelayProcessor, AProxyRelayRequests):
             self.logger.info(f'[aProxyRelay] Validating: Proxies ({self._queue_filter.qsize()}), checking if proxies meet connection requirements ...')  # noqa: B950
             self.logger.info(f'[aProxyRelay] Keep an eye on "pending task name" once it reaches ({self._queue_filter.qsize()}) all tests have been completed')  # noqa: B950
             self.logger.info('[aProxyRelay] Grab some coffee ... please wait ...')
-            await self._test_all_proxies()
+            if False:  # TODO: This method is temporary disabled
+                await self._test_all_proxies()
             self.logger.info(f'[aProxyRelay] Filter: Found {self._filtered_failed} incompetent and {self._filtered_available} available proxy servers in {datetime.now(UTC) - self.started}')  # noqa: B950
         else:
             while not self._queue_filter.empty():
